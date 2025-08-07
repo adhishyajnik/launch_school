@@ -10,12 +10,3 @@ names = (
     'Gandi Chokri',
 )
 print(names)
-
-pets = {
-    'Olu' :           'dog',
-    'Gracie' :        'cat',
-    'Ella' :          'elephant',
-    'Caesar' :        'ape',
-    'Lil Sebastian' : 'mini horse',
-}
-print(pets['Lil Sebastian'])
