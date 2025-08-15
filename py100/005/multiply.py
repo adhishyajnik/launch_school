@@ -7,6 +7,6 @@ def multiply(a, b):
 number_1 = input('Enter the first number: ')
 number_2 = input('Enter the second number: ')
 
-product = multiply(float(number_1), float(number_2), 1)
+product = multiply(float(number_1), float(number_2))
 
 print(f'{number_1} * {number_2} = {product}')
