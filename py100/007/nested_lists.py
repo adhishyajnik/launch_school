@@ -1,5 +1,5 @@
 # Launch School - Introduction to Programming With Python
-# Introduction to Programming, Chapter 7: Intro To Collections
+# Collections and Iteration, Chapter 7: Intro To Collections
 
 my_list = [1, 2, 3, [4, 5, 6]]
 another_list = list(my_list)

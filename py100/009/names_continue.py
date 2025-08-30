@@ -1,5 +1,5 @@
 # Launch School - Introduction to Programming With Python
-# Introduction to Programming, Chapter 9: Loops and Iterating
+# Collections and Iteration, Chapter 9: Loops and Iterating
 
 names = [
     'Chris',

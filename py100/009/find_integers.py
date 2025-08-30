@@ -1,5 +1,5 @@
 # Launch School - Introduction to Programming With Python
-# Introduction to Programming, Chapter 9: Loops and Iterating
+# Collections and Iteration, Chapter 9: Loops and Iterating
 
 def find_integers(hetero_list):
     return [ elem for elem in hetero_list if type(elem) is int ]

@@ -1,5 +1,5 @@
 # Launch School - Introduction to Programming With Python
-# Introduction to Programming, Chapter 7: Intro To Collections
+# Collections and Iteration, Chapter 7: Intro To Collections
 
 country_dict = {
     'Alice' : 'USA',
