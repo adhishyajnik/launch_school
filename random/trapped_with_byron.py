@@ -2,10 +2,11 @@ import os
 from random import randint as r
 
 def d6():
-    # for i in range(1, 25000):
-    #     res = r(1, 6)
-    #     print(f' Rolling: {res}', end='\r')
-    # print('', end='\r')
+    # Commented code loops through random numbers before landing on one
+    for i in range(1, 25000):
+        res = r(1, 6)
+        print(f' Rolling: {res}', end='\r')
+    print('', end='\r')
     res = r(1, 6)
     return res
 
@@ -29,13 +30,21 @@ def result_pts_str(points):
             output_str = output_str + "+" + str(points[cur_index]) + " " + suffixes[cur_index] + "  "
     return output_str
 
-# scandal, masterpiece, stress
+SCORE_CATEGORIES = ['Scandal', 'Masterpiece', 'Stress']
+
 scores = [0, 0, 0]
+six_counter = 0
+prev_rolls = []
 
 def update_scores(points):
     global scores
     for i in range(3):
         scores[i] += points[i]
+    return scores
+
+def reduce_to_zero(score_category):
+    global scores
+    scores[score_category] = 0
     return scores
 
 INTRO = '''
@@ -85,17 +94,46 @@ kill him in a fit of rage or otherwise descend into
 uncontrollable weeping from which you never emerge.''',
 ]
 
-def turn():    
+def turn():
+    global six_counter
+    global prev_rolls
+
+    six_counter = 0
+
     roll1 = d6()
     roll2 = d6()
 
-    cur_evt = EVENTS[get_event_index(roll1)]
-    outcome = OUTCOMES[cur_evt][roll2 - 1]
-    cur_msg = outcome[0]
-    raw_pts = outcome[1]
+    prev_rolls.append(roll1)
+    prev_rolls.append(roll2)
+
+    prev_rolls_str = ''
+    for num in prev_rolls:
+        prev_rolls_str += str(num)
     
-    pts_won = result_pts_str(raw_pts)
-    update_scores(raw_pts)
+    if len(prev_rolls) > 2:
+        prev_rolls.pop(0)
+        prev_rolls.pop(0)
+
+    if '666' not in prev_rolls_str:
+        cur_evt = EVENTS[get_event_index(roll1)]
+        outcome = OUTCOMES[cur_evt][roll2 - 1]
+        cur_msg = outcome[0]
+        raw_pts = outcome[1]
+        
+        pts_won = result_pts_str(raw_pts)
+        update_scores(raw_pts)
+    else:
+        six_counter = prev_rolls.count(6)
+        cur_evt = f'You rolled {six_counter} sixes in a row.'
+        cur_msg = '''Byron destroys your manuscript either by accident
+        or on purpose suring one of his episodes.'''
+
+        evt_ind = r(0, 2)
+        cat_scr = SCORE_CATEGORIES[evt_ind]
+        pts_won = f'Your {cat_scr} score is reduced to 0.'
+        reduce_to_zero(evt_ind)
+
+        prev_rolls.clear()
 
     os.system('clear')
     print(f'\nYou rolled a {roll1} and a {roll2}.')
@@ -121,7 +159,6 @@ def trapped_with_byron():
         new_turn = input('\nPress Enter to roll another turn. Input any text to quit.\n')
         if new_turn != '':
             return
-
 
 os.system('clear')
 trapped_with_byron()
