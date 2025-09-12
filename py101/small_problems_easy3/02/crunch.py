@@ -21,8 +21,8 @@ def crunch_2(string_):
 def crunch(string_):
     crunched = ''
     for idx in range(len(string_)):
-            if idx + 1 == len(string_) or string_[idx] != string_[idx + 1]:
-                crunched += string_[idx]
+        if idx + 1 == len(string_) or string_[idx] != string_[idx + 1]:
+            crunched += string_[idx]
     return crunched
 
 print(crunch('ddaaiillyy ddoouubbllee') == 'daily double')
