@@ -1,0 +1,77 @@
+# A function that returns the sum of 2 numbers.
+
+START
+
+SET function add with the parameters number1 and number2
+    return number1 + number2
+
+END
+
+
+
+
+# A function that takes a list of strings and returns a string that is all those strings concatenated together
+
+START
+
+SET function concat_lists with the parameter string_list
+    IF string_list is None: return
+    SET concatenated = ''
+    FOR each element in string_list:
+        concatenated = concatenated + element
+    return concatenated
+
+END
+
+
+
+
+# A function that takes a list of integers and returns a new list containing every odd-indexed element starting with the first element.
+
+START
+
+SET function every_other with the parameter integer_list
+    FOR n in a range the length of integer_list
+        SET new_list = []
+        IF n % 2 == 0
+            Append the nth element of integer_list to new_list
+    return new_list
+
+END
+
+
+
+
+# a function that determines the index of the 3rd occurrence of a given character in a string. For instance, if the given character is 'x' and the string is 'axbxcdxex', the function should return 6 (the index of the 3rd 'x'). If the given character does not occur at least 3 times, return None.
+
+START
+
+SET function find_3 with parameters input_string and character
+    SET occurrence = 0          # this counts number of times character repeats in input_string
+    FOR index in a range the length of input_string:
+        IF input_string[index] == character
+            occurrence = occurrence + 1
+        IF occurrence == 3
+            return index
+    return None
+
+END
+
+
+
+
+# a function that takes two lists of numbers and returns the result of merging the lists. The elements of the first list should become the elements at the even indexes of the returned list, while the elements of the second list should become the elements at the odd indexes. You may assume that both list arguments have the same number of elements. For instance:
+
+# merge([1, 2, 3], [4, 5, 6]) # => [1, 4, 2, 5, 3, 6]
+
+START
+
+SET function interleave with parameters list1 and list2
+    SET output_list = []
+    SET zipped_list = zipped collection of list1 and list 2         # this interleave pairs in tuples itself: [(1, 4), (2, 5), (3, 6)]
+    FOR list1_element, list2_element in zipped_list
+        append list1_element to output_list
+        append list2_element to output_list
+    return output_list
+
+END
