@@ -1,48 +1,75 @@
+import json
+
+# load all message strings from json file to msgs dictionary
+with open('calculator_messages.json', 'r') as file:
+    msgs = json.load(file)
+
 def prompt(prompt_message):
     print(f'==> {prompt_message}')
 
 def invalid_number(number_str):
     try:
-        int(number_str)
+        float(number_str)
     except ValueError:
         return True
     return False
 
-prompt('Welcome to Calculator!')
+def get_valid_ops(number_str):
+    if int(number_str) == 0:
+        return [
+            msgs['3op_string'],
+            msgs['3op_list'],
+            msgs['3op_err'],
+            ]
+    else:
+        return [
+            msgs['4op_string'],
+            msgs['4op_list'],
+            msgs['4op_err'],
+            ]
+
+def find_result(num1, num2, op):
+    match op:
+        case '1':
+            result = float(num1) + float(num2)
+        case '2':
+            result = float(num1) - float(num2)
+        case '3':
+            result = float(num1) * float(num2)
+        case '4':
+            result = float(num1) / float(num2)
+    return int(result) if result == int(result) else result
+
+prompt(msgs['welcome'])
 
 AGAIN = True
 while AGAIN:
 
-    prompt("What's the first number?")
+    prompt(msgs['prompt1'])
     number1 = input()
     while invalid_number(number1):
-        prompt('Please enter a valid integer.')
+        prompt(msgs['num_err'])
         number1 = input()
 
-    prompt("What's the second number?")
+    prompt(msgs['prompt2'])
     number2 = input()
     while invalid_number(number2):
-        prompt('Please enter a valid integer.')
+        prompt(msgs['num_err'])
         number2 = input()
+    
+    second_line = get_valid_ops(number2)[0]
+    valid_ops_list = get_valid_ops(number2)[1]
+    repeat_str = get_valid_ops(number2)[2]
 
-    prompt('What operation would you like to perform?\n'
-        '1) Add 2) Subtract 3) Multiply 4) Divide')
+    prompt(f"{msgs['prompt3']}{second_line}")
     operation = input()
-    while operation not in ["1", "2", "3", "4"]:
-        prompt('You must choose 1, 2, 3, or 4')
+    while operation not in valid_ops_list:
+        prompt(repeat_str)
         operation = input()
+    
+    calc_result = find_result(number1, number2, operation)
+    
+    prompt(f"{msgs['result']} {calc_result}")
 
-    match operation:
-        case '1':
-            result = int(number1) + int(number2)
-        case '2':
-            result = int(number1) - int(number2)
-        case '3':
-            result = int(number1) * int(number2)
-        case '4':
-            result = int(number1) / int(number2)
-
-    prompt(f'The result is {result}')
-
-    prompt('Would you like to perform another calculation? (yes/no)')
-    AGAIN = bool(input() == 'yes')
+    prompt(msgs['another'])
+    AGAIN = bool(input() == msgs['yes'])

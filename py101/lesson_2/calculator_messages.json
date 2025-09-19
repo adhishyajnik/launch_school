@@ -1,0 +1,20 @@
+{
+    "welcome"       : "Welcome to Calculator!",
+
+    "prompt1"       : "What's the first number?",
+    "prompt2"       : "What's the second number?",
+    "prompt3"       : "What operation would you like to perform?\n",
+    
+    "3op_string"    : "1) Add 2) Subtract 3) Multiply",
+    "4op_string"    : "1) Add 2) Subtract 3) Multiply 4) Divide",
+    "3op_list"      : ["1", "2", "3"],
+    "4op_list"      : ["1", "2", "3", "4"],
+    
+    "num_err"       : "Please enter a valid number.",
+    "3op_err"       : "You must choose 1, 2, or 3.",
+    "4op_err"       : "You must choose 1, 2, 3, or 4.",
+    
+    "result"        : "The result is",
+    "another"       : "Would you like to perform another calculation? (yes/no)",
+    "yes"           : "yes"
+}
