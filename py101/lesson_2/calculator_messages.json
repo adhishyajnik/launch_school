@@ -6,7 +6,7 @@
         "prompt2"       : "What's the second number?",
         "prompt3"       : "What operation would you like to perform?\n",
         
-        "3op_string"    : "1) Add 2) Subtract 3) Multiply",
+        "3op_string"    : "1) Add 2) Subtract 3) Multiply (Divison by 0 not possible)",
         "4op_string"    : "1) Add 2) Subtract 3) Multiply 4) Divide",
         "3op_list"      : ["1", "2", "3"],
         "4op_list"      : ["1", "2", "3", "4"],
@@ -26,7 +26,7 @@
         "prompt2"       : "¿Cuál es el segundo número?",
         "prompt3"       : "¿Qué operación te gustaría realizar?\n",
         
-        "3op_string"    : "1) Sumar 2) Restar 3) Multiplicar",
+        "3op_string"    : "1) Sumar 2) Restar 3) Multiplicar (División por 0 no posible)",
         "4op_string"    : "1) Sumar 2) Restar 3) Multiplicar 4) Dividir",
         "3op_list"      : ["1", "2", "3"],
         "4op_list"      : ["1", "2", "3", "4"],
@@ -46,7 +46,7 @@
         "prompt2"       : "Quel est le deuxième numéro?",
         "prompt3"       : "Quelle opération aimeriez-vous effectuer?\n",
         
-        "3op_string"    : "1) Ajouter 2) Soustraire 3) Multiplier",
+        "3op_string"    : "1) Ajouter 2) Soustraire 3) Multiplier (Division par 0 impossible)",
         "4op_string"    : "1) Ajouter 2) Soustraire 3) Multiplier 4) Diviser",
         "3op_list"      : ["1", "2", "3"],
         "4op_list"      : ["1", "2", "3", "4"],

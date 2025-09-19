@@ -1,7 +1,10 @@
 import locale
 import json
 
-lang = locale.getlocale()[0][0:2]
+try:
+    LANG = locale.getlocale()[0][0:2]
+except TypeError:
+    LANG = 'en'
 
 # load all message strings from json file to all_langs dictionary
 with open('calculator_messages.json', 'r') as file:
@@ -9,13 +12,22 @@ with open('calculator_messages.json', 'r') as file:
 
 # extract the correct translations and assign to msgs dictionary
 msgs = {}
-if lang in all_langs:
-    msgs = all_langs[lang]
+if LANG in all_langs:
+    msgs = all_langs[LANG]
 else:
     msgs = all_langs['en']
 
 def prompt(prompt_message):
     print(f'==> {prompt_message}')
+
+def get_number(nth):
+    num_prompt = 'prompt' + str(nth)
+    prompt(msgs[num_prompt])
+    num = input()
+    while invalid_number(num):
+        prompt(msgs['num_err'])
+        num = input()
+    return num
 
 def invalid_number(number_str):
     try:
@@ -24,18 +36,32 @@ def invalid_number(number_str):
         return True
     return False
 
-def get_valid_ops(number_str):
+def get_ops_line2(number_str):
     if float(number_str) == 0:
-        return [
-            msgs['3op_string'],
-            msgs['3op_list'],
-            msgs['3op_err'],
-            ]
-    return [
-        msgs['4op_string'],
-        msgs['4op_list'],
-        msgs['4op_err'],
-        ]
+        return msgs['3op_string']
+    return msgs['4op_string']
+
+def get_ops_list(number_str):
+    if float(number_str) == 0:
+        return msgs['3op_list']
+    return msgs['4op_list']
+
+def get_ops_error(number_str):
+    if float(number_str) == 0:
+        return msgs['3op_err']
+    return msgs['4op_err']
+
+def get_operation():
+    second_line = get_ops_line2(number2)
+    valid_ops_list = get_ops_list(number2)
+    repeat_str = get_ops_error(number2)
+
+    prompt(f"{msgs['prompt3']}{second_line}")
+    op_choice = input()
+    while op_choice not in valid_ops_list:
+        prompt(repeat_str)
+        op_choice = input()
+    return op_choice
 
 def find_result(num1, num2, op):
     match op:
@@ -54,31 +80,16 @@ prompt(msgs['welcome'])
 AGAIN = True
 while AGAIN:
 
-    prompt(msgs['prompt1'])
-    number1 = input()
-    while invalid_number(number1):
-        prompt(msgs['num_err'])
-        number1 = input()
+    number1 = get_number(1)
 
-    prompt(msgs['prompt2'])
-    number2 = input()
-    while invalid_number(number2):
-        prompt(msgs['num_err'])
-        number2 = input()
+    number2 = get_number(2)
 
-    second_line = get_valid_ops(number2)[0]
-    valid_ops_list = get_valid_ops(number2)[1]
-    repeat_str = get_valid_ops(number2)[2]
-
-    prompt(f"{msgs['prompt3']}{second_line}")
-    operation = input()
-    while operation not in valid_ops_list:
-        prompt(repeat_str)
-        operation = input()
+    operation = get_operation()
 
     calc_result = find_result(number1, number2, operation)
 
     prompt(f"{msgs['result']} {calc_result}")
 
     prompt(msgs['another'])
-    AGAIN = bool(input() == msgs['yes'])
+    another = input().casefold()
+    AGAIN = another in (msgs['yes'], msgs['yes'][0])
