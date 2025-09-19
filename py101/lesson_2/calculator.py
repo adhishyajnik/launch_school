@@ -51,10 +51,10 @@ def get_ops_error(number_str):
         return msgs['3op_err']
     return msgs['4op_err']
 
-def get_operation():
-    second_line = get_ops_line2(number2)
-    valid_ops_list = get_ops_list(number2)
-    repeat_str = get_ops_error(number2)
+def get_operation(operand2):
+    second_line = get_ops_line2(operand2)
+    valid_ops_list = get_ops_list(operand2)
+    repeat_str = get_ops_error(operand2)
 
     prompt(f"{msgs['prompt3']}{second_line}")
     op_choice = input()
@@ -84,12 +84,11 @@ while AGAIN:
 
     number2 = get_number(2)
 
-    operation = get_operation()
+    operation = get_operation(number2)
 
     calc_result = find_result(number1, number2, operation)
 
     prompt(f"{msgs['result']} {calc_result}")
 
     prompt(msgs['another'])
-    another = input().casefold()
-    AGAIN = another in (msgs['yes'], msgs['yes'][0])
+    AGAIN = input().casefold() in (msgs['yes'], msgs['yes'][0])
