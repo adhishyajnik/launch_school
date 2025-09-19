@@ -1,20 +1,62 @@
 {
-    "welcome"       : "Welcome to Calculator!",
+    "en" : {
+        "welcome"       : "Welcome to Calculator!",
 
-    "prompt1"       : "What's the first number?",
-    "prompt2"       : "What's the second number?",
-    "prompt3"       : "What operation would you like to perform?\n",
-    
-    "3op_string"    : "1) Add 2) Subtract 3) Multiply",
-    "4op_string"    : "1) Add 2) Subtract 3) Multiply 4) Divide",
-    "3op_list"      : ["1", "2", "3"],
-    "4op_list"      : ["1", "2", "3", "4"],
-    
-    "num_err"       : "Please enter a valid number.",
-    "3op_err"       : "You must choose 1, 2, or 3.",
-    "4op_err"       : "You must choose 1, 2, 3, or 4.",
-    
-    "result"        : "The result is",
-    "another"       : "Would you like to perform another calculation? (yes/no)",
-    "yes"           : "yes"
+        "prompt1"       : "What's the first number?",
+        "prompt2"       : "What's the second number?",
+        "prompt3"       : "What operation would you like to perform?\n",
+        
+        "3op_string"    : "1) Add 2) Subtract 3) Multiply",
+        "4op_string"    : "1) Add 2) Subtract 3) Multiply 4) Divide",
+        "3op_list"      : ["1", "2", "3"],
+        "4op_list"      : ["1", "2", "3", "4"],
+        
+        "num_err"       : "Please enter a valid number.",
+        "3op_err"       : "You must choose 1, 2, or 3.",
+        "4op_err"       : "You must choose 1, 2, 3, or 4.",
+        
+        "result"        : "The result is",
+        "another"       : "Would you like to perform another calculation? (yes/no)",
+        "yes"           : "yes"
+        },
+    "es" : {
+        "welcome"       : "¡Bienvenido a la Calculadora!",
+
+        "prompt1"       : "¿Cuál es el primer número?",
+        "prompt2"       : "¿Cuál es el segundo número?",
+        "prompt3"       : "¿Qué operación te gustaría realizar?\n",
+        
+        "3op_string"    : "1) Sumar 2) Restar 3) Multiplicar",
+        "4op_string"    : "1) Sumar 2) Restar 3) Multiplicar 4) Dividir",
+        "3op_list"      : ["1", "2", "3"],
+        "4op_list"      : ["1", "2", "3", "4"],
+        
+        "num_err"       : "Por favor, introduzca un número válido.",
+        "3op_err"       : "Debes elegir 1, 2, o 3.",
+        "4op_err"       : "Debes elegir 1, 2, 3, o 4.",
+        
+        "result"        : "El resultado es",
+        "another"       : "¿Te gustaría realizar otro cálculo? (sí/no)",
+        "yes"           : "sí"
+        },
+    "fr" : {
+        "welcome"       : "Bienvenue sur Calculatrice!",
+
+        "prompt1"       : "Quel est le premier numéro?",
+        "prompt2"       : "Quel est le deuxième numéro?",
+        "prompt3"       : "Quelle opération aimeriez-vous effectuer?\n",
+        
+        "3op_string"    : "1) Ajouter 2) Soustraire 3) Multiplier",
+        "4op_string"    : "1) Ajouter 2) Soustraire 3) Multiplier 4) Diviser",
+        "3op_list"      : ["1", "2", "3"],
+        "4op_list"      : ["1", "2", "3", "4"],
+        
+        "num_err"       : "Veuillez entrer un numéro valide.",
+        "3op_err"       : "Vous devez choisir 1, 2, ou 3.",
+        "4op_err"       : "Vous devez choisir 1, 2, 3 ou 4.",
+        
+        "result"        : "Le résultat est",
+        "another"       : "Voudriez-vous effectuer un autre calcul? (oui/non)",
+        "yes"           : "oui"
+        }
 }

@@ -1,8 +1,16 @@
-import json
+import json, locale
 
-# load all message strings from json file to msgs dictionary
+lang = locale.getlocale()[0][0:2]
+
+# load all message strings from json file to all_langs dictionary
 with open('calculator_messages.json', 'r') as file:
-    msgs = json.load(file)
+    all_langs = json.load(file)
+
+# extract the correct translations and assign to msgs dictionary
+if lang in all_langs:
+    msgs = all_langs[lang]
+else:
+    all_langs['en']
 
 def prompt(prompt_message):
     print(f'==> {prompt_message}')
@@ -15,7 +23,7 @@ def invalid_number(number_str):
     return False
 
 def get_valid_ops(number_str):
-    if int(number_str) == 0:
+    if float(number_str) == 0:
         return [
             msgs['3op_string'],
             msgs['3op_list'],
