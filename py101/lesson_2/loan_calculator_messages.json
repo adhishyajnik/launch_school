@@ -1,0 +1,68 @@
+{
+    "en" : {
+        "hello"     : "Loan Calculator 1.0",
+        "yes"       : ["yes", "y"],
+        "$_prompt"  : "What is the loan amount in dollars?",
+        "%_prompt"  : "What is the annual percentage rate? (100 ==> 100%)",
+        "t_prompt"  : "What is the loan duration in years?",
+        "sing_yr"   : "year",
+        "plur_yr"   : "years",
+        "confirm"   : " - is this correct? (yes/no)",
+        "result"    : "Your monthly payment is",
+        "another"   : "Would you like to start over? (yes/no)",
+        "goodbye"   : "Thanks for using Loan Calculator!",
+        "errors"    : {
+            "$_invalid_1" : "Please enter a valid dollar amount without the $.",
+            "$_invalid_2" : "Please enter a valid loan amount.",
+            "$_invalid_3" : "Please enter an amount with only 2 decimal places.",
+            "%_invalid_1" : "Please enter a valid number without the %.",
+            "%_invalid_2" : "Please enter a valid APR.",
+            "t_invalid_1" : "Please enter a valid number only.",
+            "t_invalid_2" : "Please enter a valid duration in years."
+        }
+    },
+    "es" : {
+        "hello"     : "Calculadora De Préstamos 1.0",
+        "yes"       : ["sí", "si", "s"],
+        "$_prompt"  : "¿Cuál es el monto del préstamo en dólares?",
+        "%_prompt"  : "¿Cuál es la tasa de porcentaje anual? (100 ==> 100%)",
+        "t_prompt"  : "¿Cuál es la duración del préstamo en años?",
+        "sing_yr"   : "año",
+        "plur_yr"   : "años",
+        "confirm"   : " - ¿es esto correcto? (sí/no)",
+        "result"    : "Su pago mensual es de",
+        "another"   : "¿Te gustaría empezar de nuevo? (sí/no)",
+        "goodbye"   : "¡Gracias por utilizar La Calculadora de Préstamos!",
+        "errors"    : {
+            "$_invalid_1" : "Ingrese un monto en dólares válido sin el $.",
+            "$_invalid_2" : "Ingrese un monto de préstamo válido.",
+            "$_invalid_3" : "Ingrese una cantidad con sólo 2 decimales.",
+            "%_invalid_1" : "Introduzca un número válido sin el %.",
+            "%_invalid_2" : "Ingrese un APR válido.",
+            "t_invalid_1" : "Ingrese sólo un número válido.",
+            "t_invalid_2" : "Ingrese una duración válida en años."
+        }
+    },
+    "fr" : {
+        "hello"     : "Calculateur De Prêt 1.0",
+        "yes"       : ["oui", "o"],
+        "$_prompt"  : "Quel est le montant du prêt en dollars?",
+        "%_prompt"  : "Quel est le taux annuel en pourcentage (TAEG)? (100 ==> 100%)",
+        "t_prompt"  : "Quelle est la durée du prêt en années ?",
+        "sing_yr"   : "année",
+        "plur_yr"   : "années",
+        "confirm"   : " - est-ce correct? (oui/non)",
+        "result"    : "Votre mensualité est",
+        "another"   : "Voulez-vous recommencer? (oui/non)",
+        "goodbye"   : "Merci d'utiliser Le Calculateur De Prêt!",
+        "errors"    : {
+            "$_invalid_1" : "Veuillez saisir un montant en dollars valide sans le $.",
+            "$_invalid_2" : "Veuillez saisir un montant de prêt valide.",
+            "$_invalid_3" : "Veuillez saisir un montant avec seulement 2 décimales.",
+            "%_invalid_1" : "Veuillez entrer un nombre valide sans le %.",
+            "%_invalid_2" : "Veuillez saisir un TAEG valide.",
+            "t_invalid_1" : "Veuillez saisir uniquement un numéro valide.",
+            "t_invalid_2" : "Veuillez saisir une durée valide en années."
+        }
+    }
+}
