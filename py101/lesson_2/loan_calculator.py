@@ -111,12 +111,13 @@ def get_monthly_payment(principal, int_rate, duration):
     monthly_percent = (int_rate * .01) / 12
     term_months = duration * 12
     if monthly_percent > 0:
-        return round(principal *\
-            (monthly_percent /\
+        return round(principal *
+            (monthly_percent /
             (1 - (1 + monthly_percent) ** (-term_months))), 2)
     return round((principal / term_months), 2)
 
-msgs, errs = localize()[0], localize()[1]
+messages_and_errors = localize()
+msgs, errs = messages_and_errors[0], messages_and_errors[1]
 
 AFFIRMATIVES = msgs["yes"]
 
