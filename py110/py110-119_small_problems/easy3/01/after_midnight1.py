@@ -48,16 +48,7 @@ def time_of_day(minutes):
 
 # FURTHER EXPLORATION
 def day_and_time(minutes):
-    days = 0
-    while (minutes < 0) or (minutes > MINS_PER_DAY):
-        if minutes < 0:
-            minutes += MINS_PER_DAY
-            days -= 1
-        if minutes > MINS_PER_DAY:
-            minutes -= MINS_PER_DAY
-            days += 1
-    hrs_mins = divmod(minutes, MINS_PER_HOUR)
-    duration = timedelta(days, 0, 0, 0, hrs_mins[1], hrs_mins[0])
+    duration = timedelta(0, 0, 0, 0, minutes)
     return datetime.strftime(START_DATETIME + duration, "%A %I:%M %p")
 
 
