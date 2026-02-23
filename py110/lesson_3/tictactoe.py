@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 
 """
@@ -160,8 +161,6 @@ Algorithm:
 """
 additional options to code:
     winning boards should be displayed with a line through the winning pattern
-    let user choose X's or O's
-    let user input q at any time to quit the game
 """
 
 WIN_STATES = [
@@ -188,16 +187,23 @@ DESCRIPTIONS = (
 )
 
 
-def set_mode():
-    print("Please set the difficulty mode (1 - 4):\n")
+def set_mode(state=None):
+    print("  Please set the difficulty mode (1 - 4):\n")
     print("1. Easy    2. Medium    3. Hard    4. Human\n")
 
     difficulty = None
     while difficulty is None:
         difficulty = input()
-        if len(difficulty) > 1 or difficulty not in "1234":
+        if len(difficulty) > 1 or difficulty not in "1234q":
             difficulty = None
-            print("\nPlease select a choice from 1 to 4.\n")
+            print("\n  Please select a choice from 1 to 4.\n")
+
+    if difficulty.casefold() == "q":
+        _ = os.system("clear")
+        if state:
+            display_board(state)
+        print("\nThanks for playing!\n")
+        sys.exit(0)
 
     return int(difficulty)
 
@@ -207,14 +213,23 @@ def change_mode(difficulty, state):
     change = False
     while change == False:
         change = input()
-        if len(change) > 1 or change.casefold() not in "yn":
+        if len(change) > 1 or change.casefold() not in "ynq":
             change = False
             print("\nPlease enter y or n\n")
 
-    if change.casefold() == "y":
-        display_board(state)
-        print("")
-        difficulty = set_mode()
+    match change.casefold():
+        case "y":
+            display_board(state)
+            print("")
+            difficulty = set_mode(state)
+        case "n":
+            pass
+        case "q":
+            _ = os.system("clear")
+            display_board(state)
+            print("\nThanks for playing!\n")
+            sys.exit(0)
+
     return difficulty
 
 
@@ -232,6 +247,8 @@ def display_board(state):
     ]
 
     _ = os.system("clear")
+
+    print("Enter 'q' at any time to quit.\n")
 
     for board_row in range(1, 10):
         match board_row:
@@ -252,13 +269,42 @@ def first_player():
     first = None
     while first is None:
         first = input()
-        if len(first) > 1 or first.casefold() not in "yn":
+        if len(first) > 1 or first.casefold() not in "ynq":
             first = None
-            print("\nPlease enter y or n\n")
+            print("\n  Please enter y or n.\n")
 
-    first = True if first.casefold() == "y" else False
+    match first.casefold():
+        case "y":
+            first = True
+        case "n":
+            first = False
+        case "q":
+            _ = os.system("clear")
+            print("Thanks for playing!\n")
+            sys.exit(0)
 
     return first
+
+
+def user_X_or_O():
+    print("\nDo you want to play X's or O's? (1-2 or X/O)\n")
+    print("1. X\t\t2. O\n")
+
+    while True:
+        choice = input()
+        if choice.casefold() not in "12xoq":
+            print("\n  Please enter 1, 2, X, or O.\n")
+        elif choice.casefold() == "q":
+            _ = os.system("clear")
+            print("Thanks for playing!\n")
+            sys.exit(0)
+        else:
+            break
+
+    if choice.casefold() in "1x":
+        return ["X", "O"]
+    else:
+        return ["O", "X"]
 
 
 def display_choices(state):
@@ -274,7 +320,7 @@ def display_choices(state):
             print("\t", end="")
 
 
-def user_turn(state):
+def user_turn(state, user_mark):
     choice_nums = [str(num) for num in range(1, 10) if state[num - 1] == " "]
 
     print(
@@ -283,6 +329,11 @@ def user_turn(state):
     while True:
         display_choices(state)
         choice = input()
+        if choice.casefold() == "q":
+            _ = os.system("clear")
+            display_board(state)
+            print("\nThanks for playing!\n")
+            sys.exit(0)
         if choice in choice_nums:
             break
         display_board(state)
@@ -290,15 +341,15 @@ def user_turn(state):
             "\nPlease choose a valid square number to mark from the available selections below (1-9):\n"
         )
 
-    state[int(choice) - 1] = "O"
+    state[int(choice) - 1] = user_mark
 
 
-def computer_turn(state, mode):
+def computer_turn(state, mode, user_char, comp_char):
     best_choices = set()
     # if a winning move is possible, make it (modes 1, 2, 3, 4)
     for idx_list in WIN_STATES:
         line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-        if line.count("X") == 2 and line.count(" ") == 1:
+        if line.count(comp_char) == 2 and line.count(" ") == 1:
             blank_space = idx_list[line.index(" ")]
             best_choices.add(blank_space)
 
@@ -306,7 +357,7 @@ def computer_turn(state, mode):
     if best_choices == set() and mode in [3, 4]:
         for idx_list in WIN_STATES:
             line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-            if line.count("O") == 2 and line.count(" ") == 1:
+            if line.count(user_char) == 2 and line.count(" ") == 1:
                 blank_space = idx_list[line.index(" ")]
                 best_choices.add(blank_space)
 
@@ -314,7 +365,7 @@ def computer_turn(state, mode):
     if best_choices == set() and mode in [2, 3, 4]:
         for idx_list in WIN_STATES:
             line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-            if line.count("X") == 1 and line.count(" ") == 2:
+            if line.count(comp_char) == 1 and line.count(" ") == 2:
                 blank_space1 = idx_list[line.index(" ")]
                 blank_space2 = idx_list[line.index(" ", line.index(" ") + 1)]
                 for blank_space in [blank_space1, blank_space2]:
@@ -324,7 +375,7 @@ def computer_turn(state, mode):
     if best_choices == set() and mode == 4:
         for idx_list in WIN_STATES:
             line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-            if line.count("O") == 1 and line.count(" ") == 2:
+            if line.count(user_char) == 1 and line.count(" ") == 2:
                 blank_space1 = idx_list[line.index(" ")]
                 blank_space2 = idx_list[line.index(" ", line.index(" ") + 1)]
                 for blank_space in [blank_space1, blank_space2]:
@@ -336,17 +387,17 @@ def computer_turn(state, mode):
 
     best_choices = list(best_choices)
     chosen_idx = best_choices.pop(random.randint(0, len(best_choices) - 1))
-    state[chosen_idx] = "X"
+    state[chosen_idx] = comp_char
 
 
-def win_or_tie(state):
+def win_or_tie(state, user_char, comp_char):
     result = None
     for pattern in WIN_STATES:
         pattern_values = state[pattern[0]] + state[pattern[1]] + state[pattern[2]]
 
-        if pattern_values == "OOO":
+        if pattern_values == user_char * 3:
             result = "\nYou win!\n"
-        elif pattern_values == "XXX":
+        elif pattern_values == comp_char * 3:
             result = "\nThe computer wins!\n"
 
     if result is None and " " not in state:
@@ -355,16 +406,25 @@ def win_or_tie(state):
     return result
 
 
-def play_again():
+def play_again(state):
     print("Would you like to play again? (y/n)\n")
     replay = None
     while replay is None:
         replay = input()
-        if len(replay) > 1 or replay.casefold() not in "yn":
+        if len(replay) > 1 or replay.casefold() not in "ynq":
             replay = None
             print("\nPlease enter y or n\n")
 
-    replay = True if replay.casefold() == "y" else False
+    match replay.casefold():
+        case "y":
+            replay = True
+        case "n":
+            replay = False
+        case "q":
+            _ = os.system("clear")
+            display_board(state)
+            print("\nThanks for playing!\n")
+            sys.exit(0)
 
     return replay
 
@@ -380,15 +440,16 @@ def tictactoe():
             display_board(board)
 
         if difficulty is None:
-            print("Welcome to Tic-Tac-Toe!!\n    By Adhish Yajnik\n")
+            print("\t\t  Welcome to Tic-Tac-Toe!!\n\t\t\t  By Adhish Yajnik\n")
+            print("\t   Enter 'q' at any time to quit.\n")
             difficulty = set_mode()
         else:
             difficulty = change_mode(difficulty, board)
 
-        board = new_board()
-        display_board(board)
-
         is_user_turn = first_player()
+        if not board:
+            player_mark, computer_mark = user_X_or_O()
+        board = new_board()
         display_board(board)
 
         random.seed()
@@ -399,17 +460,17 @@ def tictactoe():
         # and check for game-over each time a square is marked
         while not game_over:
             if is_user_turn:
-                user_turn(board)
+                user_turn(board, player_mark)
             else:
-                computer_turn(board, difficulty)
+                computer_turn(board, difficulty, player_mark, computer_mark)
 
             display_board(board)
-            game_over = win_or_tie(board)
+            game_over = win_or_tie(board, player_mark, computer_mark)
 
             is_user_turn = not is_user_turn
 
-        print(win_or_tie(board))
-        if play_again() == False:
+        print(win_or_tie(board, player_mark, computer_mark))
+        if play_again(board) == False:
             break
 
     _ = os.system("clear")
