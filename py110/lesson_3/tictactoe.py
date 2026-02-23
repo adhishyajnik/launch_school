@@ -288,7 +288,7 @@ def first_player():
 
 def user_X_or_O():
     print("\nDo you want to play X's or O's? (1-2 or X/O)\n")
-    print("1. X\t\t2. O\n")
+    print("1. X\t2. O\n")
 
     while True:
         choice = input()
@@ -440,8 +440,8 @@ def tictactoe():
             display_board(board)
 
         if difficulty is None:
-            print("\t\t  Welcome to Tic-Tac-Toe!!\n\t\t\t  By Adhish Yajnik\n")
-            print("\t   Enter 'q' at any time to quit.\n")
+            print("\t  Welcome to Tic-Tac-Toe!!\n\t      By Adhish Yajnik\n")
+            print("       Enter 'q' at any time to quit.\n")
             difficulty = set_mode()
         else:
             difficulty = change_mode(difficulty, board)
