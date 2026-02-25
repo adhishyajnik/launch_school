@@ -1,6 +1,7 @@
 import os
 import sys
 import random
+import re
 
 """
 High-level Algorithm:
@@ -159,9 +160,74 @@ Algorithm:
 """
 
 """
-additional options to code:
-    winning boards should be displayed with a line through the winning pattern
+updates:
++ rename functions more clearly:
+    set_mode() --> prompt_difficulty_mode()
+    change_mode() --> prompt_mode_change()
+    first_player() --> prompt_turn_order()
+    user_X_or_O() --> prompt_user_symbol()
+    play_again() --> prompt_play_again
+    win_or_tie() --> get_game_result()
+
+rename variables more clearly:
+    - consider changing state to board
+    + blank_space1 and blank_space2 in computer_turn() could be more descriptive
+    
+* define constants BOARD_SIZE = 9 and GRID_SIZE = 3 and reference those later to avoid magic numbers later in the code
++ no need to call random.seed() before each new game(?)
++ when displaying game end result message, make user press enter before asking if they want to play again
++ remove overuse of match-case constructions; replace with simple if-elifs. See display_board() for an example.
+
++ add comment to explain the formatting choice logic in display_choices()
++ add rules explanation to the welcome message
++ add descriptions to the difficulty modes
+
+- fill blank spaces on the board with numbers 1-9 instead of spaces
+
++ don't use sys.exit(0) to exit when user enters 'q'. Use a specific return value and have the main loop check for that
+
+- remove duplicate logic
+    + generic prompt_user() function whose user prompting and validation structure can be reused throughout the program
+    - generic find_best_moves() function whose structure can be reused throughout the computer_turn() function
+    + generic clear_screen() function that can be reused throughout the program
 """
+
+WELCOME_MESSAGE = """
+Welcome to Tic-Tac-Toe!!
+Programmed by Adhish Yajnik
+
+The user and the computer take turns marking squares on a 3x3 grid, 'X' and
+'O.' The first player to mark 3 squares in a row with their symbol wins
+(horizontally, vertically, or diagonally)."""
+
+GREETING_PROMPT = """Press Enter to continue.
+Enter 'q' at any time to quit."""
+
+NON_QUIT_INPUTS = "".join([chr(i) for i in range(128) if chr(i) not in "Qq"])
+
+DIFFICULTY_DESCRIPTIONS = """
+Please set the difficulty mode (1 - 4):
+
+1. EASY - the computer marks squares at random, unless it has a winning move 
+   available                                                                 
+
+2. MEDIUM - the computer avoids marking squares if they won't contribute to a
+   complete row                                                              
+
+3. HARD - the computer always tries to block a winning move available to the 
+   user                                                                      
+
+4. MASTER - the computer blocks the user from even starting a row, wherever  
+   possible                                                                  """
+
+USER_CHARACTER_PROMPT = """
+Do you want to play X's or O's? (1, 2, X, or O)
+
+1. X    2. O"""
+
+GRID_SIZE, BOARD_SIZE = 3, 9
+
+CONSOLE_SIZE = 79
 
 WIN_STATES = [
     (0, 1, 2),
@@ -186,142 +252,159 @@ DESCRIPTIONS = (
     "Bottom Right",
 )
 
-
-def set_mode(state=None):
-    print("  Please set the difficulty mode (1 - 4):\n")
-    print("1. Easy    2. Medium    3. Hard    4. Human\n")
-
-    difficulty = None
-    while difficulty is None:
-        difficulty = input()
-        if len(difficulty) > 1 or difficulty not in "1234q":
-            difficulty = None
-            print("\n  Please select a choice from 1 to 4.\n")
-
-    if difficulty.casefold() == "q":
-        _ = os.system("clear")
-        if state:
-            display_board(state)
-        print("\nThanks for playing!\n")
-        sys.exit(0)
-
-    return int(difficulty)
+DESC_MAX = 16
 
 
-def change_mode(difficulty, state):
-    print("\nWould you like to change the difficulty mode? (y/n)\n")
-    change = False
-    while change == False:
-        change = input()
-        if len(change) > 1 or change.casefold() not in "ynq":
-            change = False
-            print("\nPlease enter y or n\n")
+def clear_screen():
+    _ = os.system("clear")
 
-    match change.casefold():
+
+def center_text(input_string, end="\n"):
+    lines = input_string.split("\n")
+    centered = ""
+    for line in lines:
+        centered += line.center(CONSOLE_SIZE) + end
+
+    return centered
+
+
+def prompt_user(message, valid_inputs, error_message="Invalid input\n"):
+    print(center_text(message))
+    while True:
+        user_input = input().strip().casefold()
+        if user_input == "q":
+            return "quit"
+        if user_input in valid_inputs:
+            return user_input
+        print(center_text(error_message))
+
+
+def prompt_difficulty_mode():
+    error_message = "\nPlease select a choice from 1 to 4."
+
+    difficulty = prompt_user(DIFFICULTY_DESCRIPTIONS, "1234", error_message)
+
+    return difficulty
+
+
+def prompt_mode_change(state, difficulty, player_1, user_char, comp_char):
+    prompt_message = "\nWould you like to change the difficulty mode? (y/n)"
+    error_message = "\n  Please enter y or n"
+
+    change = prompt_user(prompt_message, "yn", error_message)
+
+    match change:
         case "y":
-            display_board(state)
+            display_board(state, difficulty, player_1, user_char, comp_char)
             print("")
-            difficulty = set_mode(state)
+            difficulty = prompt_difficulty_mode()
         case "n":
             pass
         case "q":
-            _ = os.system("clear")
-            display_board(state)
-            print("\nThanks for playing!\n")
-            sys.exit(0)
+            return "quit"
 
     return difficulty
 
 
 def new_board():
-    return [" " for _ in range(9)]
+    return [str(num + 1) for num in range(BOARD_SIZE)]
 
 
-def display_board(state):
+def display_board(state, difficulty, user_goes_first, user_char="O", comp_char="X"):
+    # this function prints one of these five strings
+    # in order to draw the tic-tac-toe board:
+    #      |     |
+    #      |     |
+    # _____|_____|_____
+    #      |     |
+    #      |     |
+    # _____|_____|_____
+    #      |     |
+    #      |     |
+    #      |     |
     board_strings = [
-        "     |     |",
-        "_____|_____|_____",
-        f"  {state[0]}  |  {state[1]}  |  {state[2]}",
-        f"  {state[3]}  |  {state[4]}  |  {state[5]}",
-        f"  {state[6]}  |  {state[7]}  |  {state[8]}",
+        center_text("     |     |     "),
+        center_text("_____|_____|_____"),
+        center_text(f"  {state[0]}  |  {state[1]}  |  {state[2]}  "),
+        center_text(f"  {state[3]}  |  {state[4]}  |  {state[5]}  "),
+        center_text(f"  {state[6]}  |  {state[7]}  |  {state[8]}  "),
     ]
 
-    _ = os.system("clear")
+    levels = {1: "EASY", 2: "MEDIUM", 3: "HARD", 4: "MASTER"}
 
-    print("Enter 'q' at any time to quit.\n")
+    clear_screen()
 
+    if user_goes_first:
+        status_line = f"USER: {user_char}    COMPUTER: {comp_char}    DIFFICULTY: {levels[int(difficulty)]}"
+    else:
+        status_line = f"COMPUTER: {comp_char}    USER: {user_char}    DIFFICULTY: {levels[int(difficulty)]}"
+
+    print(center_text("Enter 'q' at any time to quit."))
+    print(center_text(status_line))
+
+    # depending on the row of the tic-tac-toe ascii drawing
+    # draw one of the five strings above
     for board_row in range(1, 10):
-        match board_row:
-            case a if a in [1, 4, 7, 9]:
-                print(board_strings[0])
-            case b if b in [3, 6]:
-                print(board_strings[1])
-            case 2:
-                print(board_strings[2])
-            case 5:
-                print(board_strings[3])
-            case 8:
-                print(board_strings[4])
+        if board_row in [1, 4, 7, 9]:
+            print(board_strings[0], end="")
+        elif board_row in [3, 6]:
+            print(board_strings[1], end="")
+        elif board_row == 2:
+            print(board_strings[2], end="")
+        elif board_row == 5:
+            print(board_strings[3], end="")
+        elif board_row == 8:
+            print(board_strings[4], end="")
 
 
-def first_player():
-    print("\nWould you like to go first? (y/n)\n")
-    first = None
-    while first is None:
-        first = input()
-        if len(first) > 1 or first.casefold() not in "ynq":
-            first = None
-            print("\n  Please enter y or n.\n")
+def prompt_turn_order(state, difficulty, player_1, user_char, comp_char):
+    prompt_message = "\nWould you like to go first? (y/n)"
+    error_message = "\nPlease enter y or n."
 
-    match first.casefold():
+    if state:
+        display_board(state, difficulty, player_1, user_char, comp_char)
+    else:
+        clear_screen()
+    user_first = prompt_user(prompt_message, "yn", error_message)
+
+    match user_first:
         case "y":
-            first = True
+            return True
         case "n":
-            first = False
-        case "q":
-            _ = os.system("clear")
-            print("Thanks for playing!\n")
-            sys.exit(0)
-
-    return first
+            return False
+        case "quit":
+            return "quit"
 
 
-def user_X_or_O():
-    print("\nDo you want to play X's or O's? (1-2 or X/O)\n")
-    print("1. X\t2. O\n")
+def prompt_user_symbol():
+    error_message = "\nPlease enter 1, 2, X, or O."
 
-    while True:
-        choice = input()
-        if choice.casefold() not in "12xoq":
-            print("\n  Please enter 1, 2, X, or O.\n")
-        elif choice.casefold() == "q":
-            _ = os.system("clear")
-            print("Thanks for playing!\n")
-            sys.exit(0)
-        else:
-            break
+    clear_screen()
+    user_char = prompt_user(USER_CHARACTER_PROMPT, "12xo", error_message)
 
-    if choice.casefold() in "1x":
+    if user_char == "quit":
+        return "quit"
+    elif user_char in "1x":
         return ["X", "O"]
     else:
         return ["O", "X"]
 
 
 def display_choices(state):
+    cur_line = []
     for idx, value in enumerate(state):
-        if value == " ":
-            print(f"{idx + 1}. {DESCRIPTIONS[idx]}", end="")
+        if value.isnumeric():
+            cur_line.append(f"{idx + 1}. {DESCRIPTIONS[idx]}".ljust(DESC_MAX))
         else:
-            print(" " * (len(DESCRIPTIONS[idx]) + 3), end="")
+            cur_line.append(" " * (DESC_MAX))
 
-        if (idx + 1) % 3 == 0:
-            print("\n")
-        else:
-            print("\t", end="")
+        if (idx + 1) % GRID_SIZE == 0:
+            print(center_text("    ".join(cur_line)))
+            cur_line = []
 
 
-def user_turn(state, user_mark):
-    choice_nums = [str(num) for num in range(1, 10) if state[num - 1] == " "]
+def prompt_user_turn(state, difficulty, first_player, user_mark, comp_mark):
+    choice_nums = [str(num) for num in range(1, 10) if state[num - 1].isnumeric()]
 
     print(
         "\nYour Turn! Choose a square number to mark from the available selections below (1-9):\n"
@@ -330,13 +413,10 @@ def user_turn(state, user_mark):
         display_choices(state)
         choice = input()
         if choice.casefold() == "q":
-            _ = os.system("clear")
-            display_board(state)
-            print("\nThanks for playing!\n")
-            sys.exit(0)
+            return "quit"
         if choice in choice_nums:
             break
-        display_board(state)
+        display_board(state, difficulty, first_player, user_mark, comp_mark)
         print(
             "\nPlease choose a valid square number to mark from the available selections below (1-9):\n"
         )
@@ -344,138 +424,147 @@ def user_turn(state, user_mark):
     state[int(choice) - 1] = user_mark
 
 
+def find_strategic_moves(state, character, required_num):
+    moves = set()
+    for idx_list in WIN_STATES:
+        line = "".join([state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]])
+        if (line.count(character) == required_num) and (
+            len(re.findall("[1-9]", line)) == (3 - required_num)
+        ):
+            for idx, val in enumerate(line):
+                if val.isnumeric():
+                    moves.add(idx_list[idx])
+
+    return moves
+
+
 def computer_turn(state, mode, user_char, comp_char):
     best_choices = set()
     # if a winning move is possible, make it (modes 1, 2, 3, 4)
-    for idx_list in WIN_STATES:
-        line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-        if line.count(comp_char) == 2 and line.count(" ") == 1:
-            blank_space = idx_list[line.index(" ")]
-            best_choices.add(blank_space)
-
+    best_choices = find_strategic_moves(state, comp_char, 2)
     # otherwise, if user can make a winning move, block it (modes 3 and 4)
     if best_choices == set() and mode in [3, 4]:
-        for idx_list in WIN_STATES:
-            line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-            if line.count(user_char) == 2 and line.count(" ") == 1:
-                blank_space = idx_list[line.index(" ")]
-                best_choices.add(blank_space)
-
+        best_choices = find_strategic_moves(state, user_char, 2)
     # othwerise, if there are rows, columns, or diagonals with 1 X and 2 blanks, mark one of those blanks (modes 2, 3, 4)
-    if best_choices == set() and mode in [2, 3, 4]:
-        for idx_list in WIN_STATES:
-            line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-            if line.count(comp_char) == 1 and line.count(" ") == 2:
-                blank_space1 = idx_list[line.index(" ")]
-                blank_space2 = idx_list[line.index(" ", line.index(" ") + 1)]
-                for blank_space in [blank_space1, blank_space2]:
-                    best_choices.add(blank_space)
-
+    elif best_choices == set() and mode in [2, 3, 4]:
+        best_choices = find_strategic_moves(state, comp_char, 1)
     # otherwise, if there are rows, columns, or diagonals with 1 O and 2 blanks, mark one of those blanks (mode 4)
-    if best_choices == set() and mode == 4:
-        for idx_list in WIN_STATES:
-            line = [state[idx_list[0]], state[idx_list[1]], state[idx_list[2]]]
-            if line.count(user_char) == 1 and line.count(" ") == 2:
-                blank_space1 = idx_list[line.index(" ")]
-                blank_space2 = idx_list[line.index(" ", line.index(" ") + 1)]
-                for blank_space in [blank_space1, blank_space2]:
-                    best_choices.add(blank_space)
-
-    # otherwise, any blank square is fair game (modes 1, 2, 3, 4)
-    if best_choices == set():
-        best_choices = [idx for idx, elem in enumerate(state) if elem == " "]
+    elif best_choices == set() and mode == 4:
+        best_choices = find_strategic_moves(state, user_char, 1)
+    elif best_choices == set():
+        best_choices = [idx for idx, elem in enumerate(state) if elem.isnumeric()]
 
     best_choices = list(best_choices)
     chosen_idx = best_choices.pop(random.randint(0, len(best_choices) - 1))
     state[chosen_idx] = comp_char
 
 
-def win_or_tie(state, user_char, comp_char):
-    result = None
+def get_game_result(state, user_char, comp_char):
     for pattern in WIN_STATES:
         pattern_values = state[pattern[0]] + state[pattern[1]] + state[pattern[2]]
 
-        if pattern_values == user_char * 3:
-            result = "\nYou win!\n"
-        elif pattern_values == comp_char * 3:
-            result = "\nThe computer wins!\n"
+        if pattern_values == user_char * GRID_SIZE:
+            return center_text("\nYou win!")
+        elif pattern_values == comp_char * GRID_SIZE:
+            return center_text("\nThe computer wins!")
 
-    if result is None and " " not in state:
-        result = "\nIt's a tie!\n"
-
-    return result
+    if not "".join(state).isalnum():
+        return center_text("\nIt's a tie!")
 
 
-def play_again(state):
-    print("Would you like to play again? (y/n)\n")
-    replay = None
-    while replay is None:
-        replay = input()
-        if len(replay) > 1 or replay.casefold() not in "ynq":
-            replay = None
-            print("\nPlease enter y or n\n")
+def prompt_play_again():
+    prompt_message = "Would you like to play again? (y/n)"
+    error_message = "\nPlease enter y or n."
 
-    match replay.casefold():
+    replay = prompt_user(prompt_message, "yn", error_message)
+
+    match replay:
         case "y":
-            replay = True
+            return True
         case "n":
-            replay = False
+            return False
         case "q":
-            _ = os.system("clear")
-            display_board(state)
-            print("\nThanks for playing!\n")
-            sys.exit(0)
-
-    return replay
+            return "quit"
 
 
 def tictactoe():
-    _ = os.system("clear")
+    clear_screen()
 
-    board = None
-    difficulty = None
+    board, difficulty, player_mark, computer_mark, first_player = [None] * 5
 
     while True:
         if board:
-            display_board(board)
+            display_board(board, difficulty, first_player, player_mark, computer_mark)
 
         if difficulty is None:
-            print("\t  Welcome to Tic-Tac-Toe!!\n\t      By Adhish Yajnik\n")
-            print("       Enter 'q' at any time to quit.\n")
-            difficulty = set_mode()
+            print(center_text(WELCOME_MESSAGE))
+
+            advance = prompt_user(GREETING_PROMPT, NON_QUIT_INPUTS)
+            if advance == "quit":
+                break
+
+            clear_screen()
+            difficulty = prompt_difficulty_mode()
         else:
-            difficulty = change_mode(difficulty, board)
+            difficulty = prompt_mode_change(
+                board, difficulty, first_player, player_mark, computer_mark
+            )
+        if difficulty == "quit":
+            break
 
-        is_user_turn = first_player()
+        if board:
+            display_board(board, difficulty, first_player, player_mark, computer_mark)
+        first_player = is_user_turn = prompt_turn_order(
+            board, difficulty, first_player, player_mark, computer_mark
+        )
+        if is_user_turn == "quit":
+            break
         if not board:
-            player_mark, computer_mark = user_X_or_O()
+            symbols = prompt_user_symbol()
+        if symbols == "quit":
+            break
+        player_mark, computer_mark = symbols
         board = new_board()
-        display_board(board)
+        display_board(board, difficulty, first_player, player_mark, computer_mark)
 
-        random.seed()
+        # random.seed()
 
         game_over = False
+        force_quit = False
 
         # alternate between user and computer turns
         # and check for game-over each time a square is marked
         while not game_over:
             if is_user_turn:
-                user_turn(board, player_mark)
+                if (
+                    prompt_user_turn(
+                        board, difficulty, first_player, player_mark, computer_mark
+                    )
+                    == "quit"
+                ):
+                    force_quit = True
+                    break
             else:
                 computer_turn(board, difficulty, player_mark, computer_mark)
 
-            display_board(board)
-            game_over = win_or_tie(board, player_mark, computer_mark)
+            display_board(board, difficulty, first_player, player_mark, computer_mark)
+            game_over = get_game_result(board, player_mark, computer_mark)
 
             is_user_turn = not is_user_turn
 
-        print(win_or_tie(board, player_mark, computer_mark))
-        if play_again(board) == False:
+        if force_quit == True:
             break
 
-    _ = os.system("clear")
-    display_board(board)
-    print("\nThanks for playing!\n")
+        print(get_game_result(board, player_mark, computer_mark))
+        print(center_text("Press enter to continue"))
+        if input() in "Qq":
+            break
+        if prompt_play_again() in [False, "quit"]:
+            break
+
+    if board:
+        display_board(board, difficulty, first_player, player_mark, computer_mark)
+    print(center_text("\nThanks for playing!"))
 
 
 tictactoe()
