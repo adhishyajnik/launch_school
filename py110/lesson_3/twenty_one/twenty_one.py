@@ -267,7 +267,6 @@ def is_game_over(cash):
 
 def twenty_one():
     round = -1
-    reshuffle = random.randint(3, 6)
     new_deck = shuffle_deck()
 
     clear_screen()
