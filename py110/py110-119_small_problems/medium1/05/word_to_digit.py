@@ -19,8 +19,8 @@ Implicit Rules:
   2-digit numbers
 
 Data Structure/s:
-- string
-- int
+- strings
+- ints
 - list
 
 Algorithm:
