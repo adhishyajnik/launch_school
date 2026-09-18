@@ -16,7 +16,8 @@ Explicit Rules:
 Implicit Rules:
 - Input lists can contain multiple object types
 - Unclear whether input list elements should point to different
-  objects in memory than the output list. Will implement without this feature.
+  objects in memory than the output list.
+  Will implement without this feature.
 
 Data Structure/s:
 - List
@@ -25,7 +26,8 @@ Algorithm:
 - If the input is not a list, return None
 - Otherwise initialize a new list from the
   slice of input list starting at index 1
-- Then append the first element from input list to the new list and return it
+- Then append the first element from
+  input list to the new list and return it
 """
 
 
@@ -50,8 +52,8 @@ print(rotate_list([{"a": 2}, [1, 2], 3]) == [[1, 2], 3, {"a": 2}])
 print(rotate_list([]) == [])
 
 # return `None` if the argument is not a list
-print(rotate_list(None) == None)
-print(rotate_list(1) == None)
+print(rotate_list(None) == None)  # noqa
+print(rotate_list(1) == None)  # noqa
 
 # the input list is not mutated
 lst = [1, 2, 3, 4]
