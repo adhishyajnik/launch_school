@@ -69,7 +69,6 @@ def is_prime(integer):
         (integer < 2)
         or (integer > 2 and integer % 2 == 0)
         or (integer > 5 and str(integer)[-1] == "5")
-        or is_div_by_9(integer)
     ):
         return False
     for factor in range(3, math.isqrt(integer) + 1):
