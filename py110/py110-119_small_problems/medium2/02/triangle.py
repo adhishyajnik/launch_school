@@ -50,11 +50,9 @@ Algorithm:
     - if the result is positive, return 'scalene'
 """
 
-import math
-
 
 def triangle(*sides):
-    if (0 in sides) or (math.fsum(sides) - max(sides) <= max(sides)):
+    if (0 in sides) or (sum(sides) - max(sides) <= max(sides)):
         return "invalid"
     elif len(set(sides)) == 1:
         return "equilateral"
