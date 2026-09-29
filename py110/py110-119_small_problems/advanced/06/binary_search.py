@@ -80,16 +80,18 @@ Algorithm:
 """
 
 
-# recursive approach
 def binary_search(iter, search):
-    if search not in iter:  # let's try and remove these two
-        return -1  ########## lines and solve this another way
     midx = len(iter) // 2
+
     if iter[midx] == search:
         return midx
-    elif iter[midx] < search:
-        midx += binary_search(iter[midx:], search)
-    elif iter[midx] > search:
+    elif midx == 0:
+        return -1
+
+    if iter[midx] < search:
+        result = binary_search(iter[midx:], search)
+        midx = result if result == -1 else midx + result
+    else:
         midx = binary_search(iter[:midx], search)
     return midx
 
@@ -166,7 +168,7 @@ iter[mid_idx:] = [3, 4, 5]
     iter = [3, 4, 5]
     search = 8
 
-    mid_idx = 1
+2+  mid_idx = 1
     iter[mid_idx] = 4 (less than search)
     iter[mid_idx:] = [4, 5]
 
@@ -176,7 +178,7 @@ iter[mid_idx:] = [3, 4, 5]
         iter = [4, 5]
         search = 8
 
-        mid_idx = 1
+2+  1+  mid_idx = 1
         iter[mid_idx] = 5 (less than search)
         iter[mid_idx:] = [5]
 
@@ -187,9 +189,11 @@ iter[mid_idx:] = [3, 4, 5]
             iter = [5]
             search = 8
 
-            mid_idx = 0
+2+  1+  1+  mid_idx = 0
+            mid_idx == 0 and iter[mid_idx] != 8
+2+  1+  1+  -1.0
             iter[mid_idx] = 5 (less than search)
-            iter[mid_idx:] = [5] ### iter == iter[mid_idx:]
+            iter[mid_idx:] = [5]
 
                 og ind  4
                 p1 ind  2
