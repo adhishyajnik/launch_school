@@ -1,0 +1,194 @@
+"""
+set mode to user input: do you want to play H17 (easy) or S17 (hard)
+    H17: dealer stays if they have hard 17 or greater
+    S17: dealer stays if they have soft 17 or greater
+prompt the user for cash (integer)
+initialize deck (list of strings)
+set shuffle_point to a random number between 21-41 (integer)
+set repeat to True
+
+while repeat:
+    if deck has less than shuffle_point cards remaining:
+        set deck to new deck
+        set shuffle_point to a new random number between 21-41
+
+    prompt user for bet <= cash
+        bets stores the integer in a list; if user bets $5, bets = [5]
+        if the player splits a pair on a $5 bet, bets becomes [5, 5]
+
+    deal cards to dealer_hands and player_hands
+        NOTE: player_hands and dealer_hands both store the cards in a list in a
+              list;
+        if user is dealt a 2 and 4, player_hands = [[2, 4]]
+        if dealer is dealt a 5 and 6, dealer_hands = [[5, 6]]
+        if the player splits a pair of sixes, player_hands becomes [[6], [6]]
+        dealer_hands will never have more than 1 list within it, because the
+            dealer can't split. However, it allows the data structure of
+            player_hands to match dealer_hands
+
+    if the user has a non-Ace pair:
+        prompt user if they want to split
+        if user splits:
+            player_hands becomes [[card], [card]]
+            bets becomes [bet, bet]
+
+    initialize double_down to False
+    for each idx, hand in enumerate(player_hands):
+        if hand is not empty:
+            set double_down to user input: Do you want to double down?
+                # return "no" responses as None
+            if double_down:
+                bets[idx] doubles
+                one card is dealt to the user
+
+                # did player bust
+                player_value is the calculated value of hand
+                if player_value > 21:
+                    player_hands[idx] becomes "bust"
+            else:
+                while player_hands[idx] isn't "bust":
+                    set user_action to user input: Do you want to hit or stay?
+                    if the user_action = "hit":
+                        one card is dealt to the user
+
+                        # did player bust
+                        player_value is the calculated value of hand
+                        if player_value > BLACKJACK:
+                            player_hands[idx] becomes "bust"
+                            cash -= bets[idx]
+                            print bust message
+
+    # payout bets on player busts
+    for each idx, hand in enumerate(player_hands):
+        if hand is "bust":
+            player_bet[idx] is subtracted from player_cash
+            player_hands[idx] becomes []
+
+    # remove all empty lists (busts, and/or unused 2nd list for split)
+    # from player_hands
+    [hand for hand in player_hands if hand]
+        # no split and a bust becomes []
+        # a split and 1 bust becomes [[card, card]]
+        # a split and 2 busts becomes []
+
+    # dealer's turn if the player hasn't busted
+    if player_hands isn't empty:
+        if mode is H17:
+            dealer_value is the calculated value of dealer_hand; Aces = 1
+
+        elif mode is S17:
+            dealer_value is the calculated value of dealer_hand; Aces = 11
+
+        while dealer_value < 17:
+            one card is dealt to the dealer
+
+            # did dealer bust
+            dealer_value is the calculated value of dealer_hand;
+                Ace value based on H17/S17
+            if dealer_value > 21:
+                dealer_hand becomes []
+
+        # payout bets on dealer bust
+        if dealer_hand is []:
+            for each idx, hand in enumerate(player_hands):
+                player_bet[idx] is added to player_cash
+
+    # reveal dealer's cards if they haven't busted
+    if dealer_hand isn't empty:
+        reveal dealer cards
+        dealer_value is the calculated value of dealer_hand
+
+        # determine winner of both hands in player_hands vs dealer_hand
+        for each idx, hand in enumerate(player_hands):
+            player_value is the calculated value of hand
+
+            # player gets 21
+            if player_value is 21:
+                if player_hand has 2 cards & dealer_hand has more than 2 cards:
+                    # player got a natural blackjack
+                    player_bet[idx] * 1.5 is added to player_cash
+
+                elif dealer_hand has 2 cards & player_hand has more than 2:
+                    # dealer got a natural blackjack
+                    player_bet[idx] is subtracted from player_cash
+
+            # player beats dealer outright
+            elif player_value is greater than dealer_value:
+                player_bet[idx] is added to player_cash
+
+            # dealer beats player outright
+            elif dealer_value is greater than player_value:
+                player_bet[idx] is subtracted from player_cash
+
+            # dealer and player tie
+            elif player_value and dealer_value are the same:
+                push, no winner this round
+
+    # display results
+    # set repeat to user input: Do you want to play again?
+        # return "yes" values as True and "no" values as False
+"""
+
+
+
+
+
+
+# testing
+# dealer_hands = [["King", "5", "6"]]
+# player_hands = [["2", "2", "2", "2"], ["Queen", "Queen", "Ace"]]
+
+
+# deck = shuffle_deck()
+# dealer_hands, player_hands = deal_cards(deck)
+# bets = [5, 10]
+
+# reprint_hands(dealer_hands, player_hands, bets)
+
+# prompt_continue()
+
+# reprint_hands(dealer_hands, player_hands, bets)
+
+# """
+# round_no = [17]
+# deck = shuffle_deck()
+# dealer_hands = [["Ace", "King"]]
+# player_hands = [["5", "9"], ["8", "8", "5"]]
+# # player_hands = [["5", "9"]]
+# bets = [5, 5]
+# cash = [50]
+# game_stats = {
+#     "deck": deck,
+#     "dealer_hands": dealer_hands,
+#     "player_hands": player_hands,
+#     "bets": bets,
+#     "cash": cash,
+#     "round_no": round_no,
+# }
+# """
+
+# cash = prompt_hit_or_stay(1, deck, player_hands, dealer_hands, bets, cash, 1)
+# cash = double_down(1, deck, player_hands, dealer_hands, bets, cash, 1)
+# cash = player_turn(deck, player_hands, dealer_hands, bets, cash, round_no)
+
+# dealer_turn(game_stats, 1)
+# print(game_stats["dealer_hands"][0])
+
+# print(calc_points2(["6", "Ace"]))  # 17
+# print(calc_points2(["6", "Ace", "Ace"]))  # 18
+# print(calc_points2(["6", "Ace", "Ace", "10"]))  # 18
+
+# integer is a non-blackjack result
+# float is a blackjack result
+# 0 is push, negatives are losses, positives are wins
+# 2.0 and -2.0 are true blackjack win and loss respectively
+
+# results = []
+# for idx, hand in enumerate(player_hands):
+#     results.append(get_winner(idx, game_stats))
+
+# print_results(results, game_stats)
+
+# winnings = calc_winnings(results, game_stats)
+
+# print_winnings(winnings, game_stats)

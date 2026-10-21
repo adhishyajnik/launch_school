@@ -1,134 +1,6 @@
 import os
 import random
 
-# pseudocode
-"""
-set mode to user input: do you want to play H17 (easy) or S17 (hard)
-    H17: dealer stays if they have hard 17 or greater
-    S17: dealer stays if they have soft 17 or greater
-prompt the user for cash (integer)
-initialize deck (list of strings)
-set shuffle_point to a random number between 21-41 (integer)
-set repeat to True
-
-while repeat:
-    if deck has less than shuffle_point cards remaining:
-        set deck to new deck
-        set shuffle_point to a new random number between 21-41
-
-    prompt user for bet <= cash
-        bets stores the integer in a list; if user bets $5, bets = [5]
-        if the player splits a pair on a $5 bet, bets becomes [5, 5]
-
-    deal cards to dealer_hands and player_hands
-        NOTE: player_hands and dealer_hands both store the cards in a list in a list;
-        if user is dealt a 2 and 4, player_hands = [[2, 4]]
-        if dealer is dealt a 5 and 6, dealer_hands = [[5, 6]]
-        if the player splits a pair of sixes, player_hands becomes [[6], [6]]
-        dealer_hands will never have more than 1 list within it, because the dealer can't split
-            however, it allows the data structure of player_hands to match dealer_hands
-
-    if the user has a non-Ace pair:
-        prompt user if they want to split
-        if user splits:
-            player_hands becomes [[card], [card]]
-            bets becomes [bet, bet]
-
-    initialize double_down to False
-    for each idx, hand in enumerate(player_hands):
-        if hand is not empty:
-            set double_down to user input: Do you want to double down?
-                # return "no" responses as None
-            if double_down:
-                bets[idx] doubles
-                one card is dealt to the user
-
-                # did player bust
-                player_value is the calculated value of hand
-                if player_value > 21:
-                    player_hands[idx] becomes "bust"
-            else:
-                while player_hands[idx] isn't "bust":
-                    set user_action to user input: Do you want to hit or stay?
-                    if the user_action = "hit":
-                        one card is dealt to the user
-
-                        # did player bust
-                        player_value is the calculated value of hand
-                        if player_value > BLACKJACK:
-                            player_hands[idx] becomes "bust"
-                            cash -= bets[idx]
-                            print bust message
-
-    # payout bets on player busts
-    for each idx, hand in enumerate(player_hands):
-        if hand is "bust":
-            player_bet[idx] is subtracted from player_cash
-            player_hands[idx] becomes []
-
-    # remove all empty lists (busts, and/or unused 2nd list for split) from player_hands
-    [hand for hand in player_hands if hand]
-        # no split and a bust becomes []
-        # a split and 1 bust becomes [[card, card]]
-        # a split and 2 busts becomes []
-
-    # dealer's turn if the player hasn't busted
-    if player_hands isn't empty:
-        if mode is H17:
-            dealer_value is the calculated value of dealer_hand; Aces = 1
-
-        elif mode is S17:
-            dealer_value is the calculated value of dealer_hand; Aces = 11
-
-        while dealer_value < 17:
-            one card is dealt to the dealer
-
-            # did dealer bust
-            dealer_value is the calculated value of dealer_hand; Ace value based on H17/S17
-            if dealer_value > 21:
-                dealer_hand becomes []
-
-        # payout bets on dealer bust
-        if dealer_hand is []:
-            for each idx, hand in enumerate(player_hands):
-                player_bet[idx] is added to player_cash
-
-    # reveal dealer's cards if they haven't busted
-    if dealer_hand isn't empty:
-        reveal dealer cards
-        dealer_value is the calculated value of dealer_hand
-
-        # determine winner of both hands in player_hands vs dealer_hand
-        for each idx, hand in enumerate(player_hands):
-            player_value is the calculated value of hand
-
-            # player gets 21
-            if player_value is 21:
-                if player_hand has 2 cards and dealer_hand has more than 2 cards:
-                    # player got a natural blackjack
-                    player_bet[idx] * 1.5 is added to player_cash
-
-                elif dealer_hand has 2 cards and player_hand has more than 2 cards:
-                    # dealer got a natural blackjack
-                    player_bet[idx] is subtracted from player_cash
-
-            # player beats dealer outright
-            elif player_value is greater than dealer_value:
-                player_bet[idx] is added to player_cash
-
-            # dealer beats player outright
-            elif dealer_value is greater than player_value:
-                player_bet[idx] is subtracted from player_cash
-
-            # dealer and player tie
-            elif player_value and dealer_value are the same:
-                push, no winner this round
-
-    # display results
-    # set repeat to user input: Do you want to play again?
-        # return "yes" values as True and "no" values as False
-"""
-
 # CONSTANTS
 # Cards
 SUITS = 4
@@ -153,7 +25,7 @@ HIT_THRESHOLD = 17
 # Strings
 AN_NOUNS = ["8", "Ace"]
 
-MODE_STR = """Would you like to play (1) H17 or (2) S17?
+MODE_STR = r"""Would you like to play (1) H17 or (2) S17?
 
 H17: The dealer hits if they have less than 17 points, or
      if they have 17 points by with an 11-point Ace in hand (a soft 17).
@@ -161,10 +33,13 @@ H17: The dealer hits if they have less than 17 points, or
 S17: The dealer stays if they have 17 points,
      whether it's a soft 17 or a hard 17."""
 
-WELCOME_STR = """Welcome to Blackjack!
-Programmed by Adhish Yajnik
-
-Enter "q" at any time to quit.
+WELCOME_STR = r"""                      ___  __         __     _          __
+                     / _ )/ /__ _____/ /__  (_)__ _____/ /__
+                    / _  / / _ `/ __/  '_/ / / _ `/ __/  '_/
+                   /____/_/\_,_/\__/_/\_\_/ /\_,_/\__/_/\_\
+                                       |___/
+                          Programmed by Adhish Yajnik
+                         Enter (q) at any time to quit
 
 Blackjack is a popular casino card game where players aim to beat the
 dealer by having a hand total closer to 21 than the dealer's, without
@@ -180,46 +55,45 @@ MSGS = {
     "prompt_mode": MODE_STR,
     "prompt_cash": "How much cash do you have to play with?",
     "prompt_bet": "How much do you want to bet on this hand?",
-    "prompt_split": "Do you want to split your {} pair? (y) (n)",  # 1: player_hands[0]
+    "prompt_split": "Do you want to split your {} pair? (y) (n)",
     "prompt_ddown": "Do you want to double down? (y) (n)",
     "prompt_hit": "Do you want to (1) hit or (2) stay?",
     "prompt_repeat": "Do you want to play another hand? (y) (n)",
     "err_valid_num": "Please enter a positive whole number.",
-    "err_choices": "Please enter a number from 1 to {}.",  # 1: num_choices
+    "err_choices": "Please enter a number from 1 to {}.",
     "err_y_n": "Please enter y or n only, or q to quit.",
-    "err_limit": "Please enter a bet you can afford. (${} max)",  # 1: cash
+    "err_limit": "Please enter a bet you can afford. (${} max)",
     "welcome": WELCOME_STR,
-    "inital_wager": "You wagered ${} on this hand.",  # 1: bets[0]
-    "header": "ROUND: {}    WAGER{}: {}{}    CASH: {}",  # 1: round_num, 2: bets[0], 3: bets[-1] or "", 4: "$n"
+    "inital_wager": "You wagered ${} on this hand.",
+    "header": "ROUND: {}    WAGER{}: {}{}    CASH: {}",
     "deck_shuffled": "The deck has been shuffled.",
-    "wager_doubled": "Your wager doubled to ${}.",  # 1: bets[idx]
-    "player_draw": "You drew {} {}{}",  # 1: "a" or "an", 2: "card", 3: "." or MSGS["and_bust"]
-    "player_stay": "You stayed at {}.",  # 1: player_value
+    "wager_doubled": "Your wager doubled to ${}.",
+    "player_draw": "You drew {} {}{}",
+    "player_stay": "You stayed at {}.",
     "and_bust": " and went bust.",
-    "money_won_lost": "{}You {} ${}",  # 1: "Hand {}: " or "", 2: "won" or "lost", 3: abs(int(bets[idx] * multiplier))
-    "bust_lost": "You lost ${}.",  # 1: "$n"
+    "money_won_lost": "{}You {} ${}",
+    "bust_lost": "You lost ${}.",
     "dealer_turn": "It is the dealer's turn.",
-    "dealer_draw": "The dealer drew {} {}{}",  # 1: "a" or "an", 2: "card", 3: "." or MSGS["and_bust"]
+    "dealer_draw": "The dealer drew {} {}{}",
     "dealer_stay": "The dealer stays.",
-    "bust_won": "You won ${}.",  # 1: "$n"
-    "hole_card": "The dealer's hole card was {} {}",  # 1: "a/an", 2: card,
-    "won_lost": "{}{} won {} to {}{}",  # 1: "Hand {}: " or "", 2: "You" or "The dealer", 3: player_pts, 4: dealer_pts, 5: "!" or "."
-    "push": "{}Push. No winner.",  # 1: "Hand {}: " or ""
-    "blackjack": "{}{} won with a {}blackjack{}",  # 1: "Hand {}: " or "", 2: "You" or "The dealer", 3: "natural " or "", 4: "!" or "."
-    "result": "{}You {} ${}",  # 1: "         " or "", 2: "won" or "lost", 3: "n"
-    "cash_on_hand": "You have ${}.",  # 1: "$n"
+    "bust_won": "You won ${}.",
+    "hole_card": "The dealer's hole card was {} {}",
+    "won_lost": "{}{} won {} to {}{}",
+    "push": "{}Push. No winner.",
+    "blackjack": "{}{} won with a {}blackjack{}",
+    "result": "{}You {} ${}",
+    "cash_on_hand": "You have ${}.",
     "out_of_cash": "You're out of cash!",
     "thanks": "Thanks for playing!",
     "goodbye": "Goodbye!",
 }
 
 
-def prompt_continue() -> None | str:
+def prompt_continue() -> str:
     print(f"{MSGS['prompt_continue']}\n")
     user_input = input().strip().casefold()
     print()
-    if user_input == "q":
-        return "q"
+    return user_input if user_input == "q" else ""
 
 
 def prompt_dollars(pmt_msg: str, limit=float("inf")) -> int | str:
@@ -233,19 +107,17 @@ def prompt_dollars(pmt_msg: str, limit=float("inf")) -> int | str:
 
         err_msg = MSGS["err_valid_num"]
         # is integer greater than 0
-        if (not user_input.isdigit()) or (not int(user_input) > 0):
+        if (not user_input.isdigit()) or (int(user_input) <= 0):
             print(f"{err_msg}\n")
             continue
-        else:
-            user_num = int(user_input)
+        user_num = int(user_input)
 
         # is less than or equal to limit
         err_limit = MSGS["err_limit"].format(limit)
         if user_num > limit:
             print(f"{err_limit}\n")
             continue
-        else:
-            return [user_num]
+        return [user_num]
 
 
 def prompt_choices(
@@ -286,13 +158,12 @@ def prompt_mode() -> int:
     return prompt_choices(MSGS["prompt_mode"], 2)
 
 
-def prompt_split(player_hands: list, bets: list) -> bool | str:
+def prompt_split(player_hands: list, bets: list) -> str:
     split = prompt_y_n(MSGS["prompt_split"].format(player_hands[0][0]))
-    if split == "q":
-        return "q"
     if split == "y":
         player_hands.append([player_hands[0].pop()])
         bets.append(bets[0])
+    return split
 
 
 def prompt_ddown() -> str:
@@ -405,12 +276,12 @@ def is_bust(hand: list) -> bool:
     return calc_points2(hand) > BLACKJACK
 
 
-def remove_empty_lists(iter: list) -> None:
-    while [] in iter:
-        iter.remove([])
+def remove_empty_lists(lst: list) -> None:
+    while [] in lst:
+        lst.remove([])
 
 
-def double_down2(idx: int, game_stats: dict) -> None | str:
+def double_down2(idx: int, game_stats: dict) -> str:
     game_stats["bets"][idx] *= 2
     reprint_hands(game_stats)
     print(MSGS["wager_doubled"].format(game_stats["bets"][idx]))
@@ -425,7 +296,9 @@ def double_down2(idx: int, game_stats: dict) -> None | str:
 
     reprint_hands(game_stats)
     drawn_card = game_stats["player_hands"][idx][-1]
-    print(MSGS["player_draw"].format(get_a_an(drawn_card), drawn_card, end_str))
+    print(
+        MSGS["player_draw"].format(get_a_an(drawn_card), drawn_card, end_str)
+    )
     print()
 
     if prompt_continue() == "q":
@@ -440,7 +313,9 @@ def double_down2(idx: int, game_stats: dict) -> None | str:
         if prompt_continue() == "q":
             return "q"
 
-        output_str += "\n" + MSGS["cash_on_hand"].format(game_stats["cash"][0]) + "\n"
+        output_str += (
+            "\n" + MSGS["cash_on_hand"].format(game_stats["cash"][0]) + "\n"
+        )
         reprint_hands(game_stats)
         print(output_str)
 
@@ -449,9 +324,10 @@ def double_down2(idx: int, game_stats: dict) -> None | str:
 
         game_stats["player_hands"][idx].clear()
         game_stats["bets"][idx] = ""
+    return ""
 
 
-def hit_or_stay2(idx: int, game_stats: dict) -> None | str:
+def hit_or_stay2(idx: int, game_stats: dict) -> str:
     while True:
         reprint_hands(game_stats)
         choice = prompt_choices(MSGS["prompt_hit"], 2)
@@ -474,7 +350,11 @@ def hit_or_stay2(idx: int, game_stats: dict) -> None | str:
 
             reprint_hands(game_stats)
             drawn_card = game_stats["player_hands"][idx][-1]
-            print(MSGS["player_draw"].format(get_a_an(drawn_card), drawn_card, end_str))
+            print(
+                MSGS["player_draw"].format(
+                    get_a_an(drawn_card), drawn_card, end_str
+                )
+            )
             print()
 
             if prompt_continue() == "q":
@@ -482,7 +362,9 @@ def hit_or_stay2(idx: int, game_stats: dict) -> None | str:
 
             if bust:
                 game_stats["cash"][0] -= game_stats["bets"][idx]
-                output_str = MSGS["bust_lost"].format(game_stats["bets"][idx]) + "\n"
+                output_str = (
+                    MSGS["bust_lost"].format(game_stats["bets"][idx]) + "\n"
+                )
                 reprint_hands(game_stats)
                 print(output_str)
 
@@ -490,7 +372,9 @@ def hit_or_stay2(idx: int, game_stats: dict) -> None | str:
                     return "q"
 
                 output_str += (
-                    "\n" + MSGS["cash_on_hand"].format(game_stats["cash"][0]) + "\n"
+                    "\n"
+                    + MSGS["cash_on_hand"].format(game_stats["cash"][0])
+                    + "\n"
                 )
                 reprint_hands(game_stats)
                 print(output_str)
@@ -501,9 +385,10 @@ def hit_or_stay2(idx: int, game_stats: dict) -> None | str:
                 game_stats["player_hands"][idx].clear()
                 game_stats["bets"][idx] = ""
                 break
+    return ""
 
 
-def player_turn2(game_stats: dict) -> None | str:
+def player_turn2(game_stats: dict) -> str:
     for idx, hand in enumerate(game_stats["player_hands"]):
         if len(hand) < 2:
             hit(hand, game_stats["deck"])
@@ -517,9 +402,10 @@ def player_turn2(game_stats: dict) -> None | str:
         else:
             if hit_or_stay2(idx, game_stats) == "q":
                 return "q"
+        return ""
 
 
-def dealer_turn(game_stats: dict, mode: int):
+def dealer_turn(game_stats: dict, mode: int) -> str:
     reprint_hands(game_stats)
 
     print(MSGS["dealer_turn"])
@@ -549,7 +435,11 @@ def dealer_turn(game_stats: dict, mode: int):
 
             reprint_hands(game_stats)
             drawn_card = game_stats["dealer_hands"][0][-1]
-            print(MSGS["dealer_draw"].format(get_a_an(drawn_card), drawn_card, end_str))
+            print(
+                MSGS["dealer_draw"].format(
+                    get_a_an(drawn_card), drawn_card, end_str
+                )
+            )
             print()
 
             if prompt_continue() == "q":
@@ -566,7 +456,9 @@ def dealer_turn(game_stats: dict, mode: int):
                     return "q"
 
                 output_str += (
-                    "\n" + MSGS["cash_on_hand"].format(game_stats["cash"][0]) + "\n"
+                    "\n"
+                    + MSGS["cash_on_hand"].format(game_stats["cash"][0])
+                    + "\n"
                 )
                 reprint_hands(game_stats)
                 print(output_str)
@@ -584,6 +476,7 @@ def dealer_turn(game_stats: dict, mode: int):
             if prompt_continue() == "q":
                 return "q"
             break
+    return ""
 
 
 def reveal_hole_card(game_stats: dict) -> None:
@@ -633,7 +526,7 @@ def get_winner(p_hand_idx: int, game_stats: dict) -> int | float:
     return result_sign[idx] * win_type
 
 
-def print_results(results: list, game_stats: dict) -> None | str:
+def print_results(results: list, game_stats: dict) -> str:
     dealer_pts = calc_points2(game_stats["dealer_hands"][0])
 
     result_str = ""
@@ -650,7 +543,9 @@ def print_results(results: list, game_stats: dict) -> None | str:
                 return "q"
             continue
 
-        who_won, end_str = ["You", "!"] if multiplier > 0 else ["The dealer", "."]
+        who_won, end_str = (
+            ["You", "!"] if multiplier > 0 else ["The dealer", "."]
+        )
 
         # if the result is a blackjack (regular or natural)
         if isinstance(multiplier, float):
@@ -661,20 +556,19 @@ def print_results(results: list, game_stats: dict) -> None | str:
                 + "\n"
             )
             print(result_str)
-            if prompt_continue():
-                return "q"
-        else:
-            player_pts = calc_points2(game_stats["player_hands"][idx])
-            gtr_pts = int(max(player_pts, dealer_pts))
-            lsr_pts = int(min(player_pts, dealer_pts))
-            result_str += (
-                ("\n" * idx)
-                + MSGS["won_lost"].format(hand_no, who_won, gtr_pts, lsr_pts, end_str)
-                + "\n"
+            return "q" if prompt_continue() else ""
+        player_pts = calc_points2(game_stats["player_hands"][idx])
+        gtr_pts = int(max(player_pts, dealer_pts))
+        lsr_pts = int(min(player_pts, dealer_pts))
+        result_str += (
+            ("\n" * idx)
+            + MSGS["won_lost"].format(
+                hand_no, who_won, gtr_pts, lsr_pts, end_str
             )
-            print(result_str)
-            if prompt_continue():
-                return "q"
+            + "\n"
+        )
+        print(result_str)
+        return "q" if prompt_continue() else ""
 
 
 def calc_winnings(results: list, game_stats: dict) -> list:
@@ -684,32 +578,29 @@ def calc_winnings(results: list, game_stats: dict) -> list:
     return winnings
 
 
-def print_winnings(winnings: list, game_stats: dict) -> None | str:
+def print_winnings(winnings: list, game_stats: dict) -> str:
     result_str = ""
     for idx, amount in enumerate(winnings):
         hand_no = f"Hand {idx + 1}: " if len(winnings) > 1 else ""
         if amount == 0:
             result_str += ("\n" * idx) + MSGS["push"].format(hand_no) + "\n"
             continue
-        else:
-            won_lost = "won" if amount > 0 else "lost"
-            result_str += (
-                ("\n" * idx)
-                + MSGS["money_won_lost"].format(hand_no, won_lost, abs(amount))
-                + "\n"
-            )
+        won_lost = "won" if amount > 0 else "lost"
+        result_str += (
+            ("\n" * idx)
+            + MSGS["money_won_lost"].format(hand_no, won_lost, abs(amount))
+            + "\n"
+        )
 
         reprint_hands(game_stats, reveal=True)
         print(result_str)
-        if prompt_continue():
-            return "q"
+        return "q" if prompt_continue() else ""
 
     game_stats["cash"][0] += sum(winnings)
     reprint_hands(game_stats, reveal=True)
     print(result_str)
     print(MSGS["cash_on_hand"].format(game_stats["cash"][0]))
-    if prompt_continue():
-        return "q"
+    return "q" if prompt_continue() else ""
 
 
 # MAIN FUNCTION
@@ -780,7 +671,8 @@ def twenty_one() -> None:
         if player_turn2(game_stats) == "q":
             break
 
-        # remove all empty lists (busts, and/or unused 2nd list for split) from player_hands and bets
+        # remove all empty lists (busts, and/or unused 2nd list for split)
+        # from player_hands and bets
         remove_empty_lists(player_hands)
         remove_empty_lists(bets)
 
@@ -794,11 +686,10 @@ def twenty_one() -> None:
                 round_no[0] += 1
                 continue
             # if player is out of cash, end program
-            else:
-                reprint_hands(game_stats)
-                print(MSGS["out_of_cash"])
-                print()
-                break
+            reprint_hands(game_stats)
+            print(MSGS["out_of_cash"])
+            print()
+            break
 
         # if player hasn't bust, dealer's turn
         if dealer_turn(game_stats, mode) == "q":
@@ -816,11 +707,10 @@ def twenty_one() -> None:
                 round_no[0] += 1
                 continue
             # if player is out of cash, end program
-            else:
-                reprint_hands(game_stats)
-                print(MSGS["out_of_cash"])
-                print()
-                break
+            reprint_hands(game_stats)
+            print(MSGS["out_of_cash"])
+            print()
+            break
 
         # reveal dealer's hole card
         reprint_hands(game_stats, reveal=True)
@@ -865,63 +755,3 @@ def twenty_one() -> None:
 
 
 twenty_one()
-
-
-# testing
-# dealer_hands = [["King", "5", "6"]]
-# player_hands = [["2", "2", "2", "2"], ["Queen", "Queen", "Ace"]]
-
-
-# deck = shuffle_deck()
-# dealer_hands, player_hands = deal_cards(deck)
-# bets = [5, 10]
-
-# reprint_hands(dealer_hands, player_hands, bets)
-
-# prompt_continue()
-
-# reprint_hands(dealer_hands, player_hands, bets)
-
-"""
-round_no = [17]
-deck = shuffle_deck()
-dealer_hands = [["Ace", "King"]]
-player_hands = [["5", "9"], ["8", "8", "5"]]
-# player_hands = [["5", "9"]]
-bets = [5, 5]
-cash = [50]
-game_stats = {
-    "deck": deck,
-    "dealer_hands": dealer_hands,
-    "player_hands": player_hands,
-    "bets": bets,
-    "cash": cash,
-    "round_no": round_no,
-}
-"""
-
-# cash = prompt_hit_or_stay(1, deck, player_hands, dealer_hands, bets, cash, 1)
-# cash = double_down(1, deck, player_hands, dealer_hands, bets, cash, 1)
-# cash = player_turn(deck, player_hands, dealer_hands, bets, cash, round_no)
-
-# dealer_turn(game_stats, 1)
-# print(game_stats["dealer_hands"][0])
-
-# print(calc_points2(["6", "Ace"]))  # 17
-# print(calc_points2(["6", "Ace", "Ace"]))  # 18
-# print(calc_points2(["6", "Ace", "Ace", "10"]))  # 18
-
-# integer is a non-blackjack result
-# float is a blackjack result
-# 0 is push, negatives are losses, positives are wins
-# 2.0 and -2.0 are true blackjack win and loss respectively
-
-# results = []
-# for idx, hand in enumerate(player_hands):
-#     results.append(get_winner(idx, game_stats))
-
-# print_results(results, game_stats)
-
-# winnings = calc_winnings(results, game_stats)
-
-# print_winnings(winnings, game_stats)
