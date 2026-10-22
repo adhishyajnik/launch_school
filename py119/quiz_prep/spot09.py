@@ -40,6 +40,8 @@ Sub-algorithm: inner_sort
 - iterate through each punct_idx, punct in punct_chars:
     - insert the punct into sorted_list at punct_idx
 - return sorted_list joined to a string with no separating characters
+
+extra line
 """
 
 
