@@ -48,7 +48,7 @@ def is_prime(integer):
     ):
         return False
     for factor in range(3, integer // 2, 2):  # check only odd factors
-        if str(factor)[-1] == "5":  # skip odd factors divisible by 5.
+        if str(factor)[-1] == "5":  # skip odd factors divisible by 5
             continue
         if integer % factor == 0:
             return False
