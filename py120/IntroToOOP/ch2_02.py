@@ -21,46 +21,11 @@ class Car:
     def __init__(self, model, year, color):
         self._model = model
         self._year = year
-        self._color = color
-        self._speed = 0
-        self._engine_state = "off"
+        self.color = color
+        self.speed = 0
         print(
             f"This {self.__class__.__name__.lower()} is a {color} {year} {model}."
         )
-
-    @property
-    def engine_state(self):
-        return self._engine_state
-
-    @engine_state.setter
-    def engine_state(self, new_state):
-        if new_state.lower() in ["on", "off"]:
-            if self._speed == 0:
-                self._engine_state = new_state.lower()
-            else:
-                print(
-                    "Please brake or set speed to 0 mph before turning the engine off."
-                )
-        else:
-            raise ValueError("new_state must be on or off, case-insensitive.")
-
-    @property
-    def speed(self):
-        return self._speed
-
-    @speed.setter
-    def speed(self, new_value):
-        if self.engine_state == "on":
-            if isinstance(new_value, int) == False:
-                raise TypeError("speed must be an integer.")
-            elif new_value <= 0:
-                raise ValueError("speed must be greater than zero.")
-            else:
-                self._speed = new_value
-        else:
-            print(
-                f"Turn on the {self.color} {self.year} {self.model}'s engine to set its speed."
-            )
 
     @property
     def model(self):
@@ -76,82 +41,101 @@ class Car:
 
     @color.setter
     def color(self, new_color):
-        if new_color.lower() in Car.AVAIL_COLORS:
-            self._color = new_color.lower()
-        else:
+        if new_color.lower() not in Car.AVAIL_COLORS:
             raise ValueError(
                 f"new_color must be {', '.join(Car.AVAIL_COLORS[:-2]) + ', or ' + Car.AVAIL_COLORS[-1]}, case-insensitive."
             )
 
+        self._color = new_color.lower()
+
+    @property
+    def speed(self):
+        return self._speed
+
+    @speed.setter
+    def speed(self, new_value):
+        if isinstance(new_value, int) == False:
+            raise TypeError("speed must be an integer.")
+        if new_value < 0:
+            raise ValueError("speed must be greater than zero.")
+
+        self._speed = new_value
+
+    def turn_on(self):
+        print(f"The {self.color} {self.year} {self.model} is now on.")
+
+    def turn_off(self):
+        self.speed = 0
+        print(f"The {self.color} {self.year} {self.model} is now off.")
+
     def accelerate(self, amount):
-        if self._engine_state == "on":
-            if isinstance(amount, int) == False:
-                raise TypeError("amount must be an integer.")
-            elif amount <= 0:
-                raise ValueError("amount must be positive.")
-            else:
-                self._speed += amount
-                print(
-                    f"The {self.color} {self.year} {self.model} accelerated to {amount} mph."
-                )
-        else:
-            print(
-                f"Turn on the {self.color} {self.year} {self.model}'s engine to accelerate."
-            )
+        if isinstance(amount, int) == False:
+            raise TypeError("amount must be an integer.")
+        if amount <= 0:
+            raise ValueError("amount must be positive.")
+
+        self._speed += amount
+        print(
+            f"The {self.color} {self.year} {self.model} accelerated {amount} mph."
+        )
 
     def brake(self, amount):
-        if self._engine_state == "on":
-            if isinstance(amount, int) == False:
-                raise TypeError("amount must be an integer.")
-            if amount <= 0:
-                raise ValueError("amount must be positive.")
-            else:
-                amount = min(self._speed, amount)
-                self._speed = self._speed - amount
-                print(
-                    f"The {self.color} {self.year} {self.model} braked {amount} mph."
-                )
-        else:
-            print(
-                f"Turn on the {self.color} {self.year} {self.model}'s engine to brake."
-            )
+        if isinstance(amount, int) == False:
+            raise TypeError("amount must be an integer.")
+        if amount <= 0:
+            raise ValueError("amount must be positive.")
+
+        amount = min(self._speed, amount)
+        self._speed = self._speed - amount
+        print(
+            f"The {self.color} {self.year} {self.model} braked {amount} mph."
+        )
 
 
+# Tests
 insight = Car("Insight", 2010, "black")  # This car is a black 2010 Insight.
 print()
-print(insight.year)  # 2010
-print(insight.model)  # Insight
+print(f"The car's year is {insight.year}.")  # The car's year is 2010.
+print(f"The car's model is a {insight.model}")  # The car's model is a Insight.
 print()
-print(insight.color)  # black
+print(f"The car is {insight.color}.")  # The car is black.
 insight.color = "Blue"
-print(insight.color)  # blue
+print(f"The car is {insight.color}.")  # The car is blue.
 print()
-print(insight.speed)  # 0
-insight.speed = 50  # turn on engine first
-print(insight.speed)  # 0
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 0 mph.
 print()
-print(insight.engine_state)  # off
-insight.engine_state = "ON"
-print(insight.engine_state)  # on
+insight.turn_on()  # The blue 2010 Insight is now on.
 print()
-print(insight.speed)  # 0
 insight.speed = 50
-print(insight.speed)  # 50
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 50 mph.
 print()
-insight.engine_state = "off"  # decelerate to 0 mph first
+insight.accelerate(15)  # The blue 2010 Insight accelerated 15 mph.
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 65 mph.
 print()
-insight.accelerate(15)  # The blue 2010 Insight accelerated to 65 mph.
-print(insight.speed)  # 65
-insight.brake(30)  # The blue 2010 Insight braked to 35 mph.
-print(insight.speed)  # 35
-insight.brake(100)  # The blue 2010 Insight braked to 0 mph.
-print(insight.speed)  # 0
+insight.brake(30)  # The blue 2010 Insight braked 30 mph.
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 35 mph.
 print()
-insight.engine_state = "off"
-print(insight.engine_state)  # off
+insight.brake(100)  # The blue 2010 Insight braked 35 mph.
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 0 mph.
+print()
+insight.speed = 25
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 25 mph.
+print()
+insight.turn_off()  # The blue 2010 Insight is now off.
+print()
+print(f"The car is traveling at {insight.speed} mph.")
+# The car is traveling at 0 mph.
 print()
 print()
 
+# tests below are primarily to ensure that the correct errors are raised
+"""
 camry = Car("Camry", 2023, "silver")  # This car is a silver 2023 Camry.
 print()
 camry.engine_state = "warm-up"  # TypeError
@@ -175,3 +159,4 @@ camry.brake("faster")  # TypeError
 camry.brake(15.5)  # TypeError
 camry.brake(-5)  # ValueError
 camry.brake(0)  # ValueError
+"""

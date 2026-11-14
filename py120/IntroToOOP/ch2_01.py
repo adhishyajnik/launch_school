@@ -102,6 +102,7 @@ class Car:
             )
 
 
+# Tests
 insight = Car("Insight", 2010, "black")
 insight.turn_on_engine()
 insight.accelerate(45)
