@@ -16,6 +16,10 @@ class Car:
             f"This {self.__class__.__name__.lower()} is a {color} {year} {model}."
         )
 
+    @classmethod
+    def what_am_i(cls):
+        print(f"I am a {cls.__name__}!")
+
     @staticmethod
     def average_mpg(gallons, miles):
         mpg = miles // gallons
@@ -104,3 +108,5 @@ print()
 insight.turn_off()
 print()
 Car.turn_on()
+print()
+Car.what_am_i()
