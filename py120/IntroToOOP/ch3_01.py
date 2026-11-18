@@ -1,5 +1,5 @@
 """
-Create a Car class that makes the following code work as indicated:
+Create a Car class that makes the following code work as indicated.
 """
 
 
