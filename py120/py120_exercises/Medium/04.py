@@ -13,20 +13,6 @@ methods should return one of the matching cards; it doesn't matter which one.
 Besides any methods needed to determine the lowest and highest cards, create a
 __str__ method that returns a string representation of the card, e.g., "Jack of
 Diamonds", "4 of Clubs", etc.
-
----
-
-Methods needed:
-    - min (polymorphic)
-        if one card underranks all others, return that card
-        if there are multiple cards of the lowest rank, return any one of them
-    - max (polymorphic)
-        if one card outranks all others, return that card
-        if there are multiple cards of the highest rank, return any one of them
-    - rank
-        returns the rank of the calling card
-    - __str__:
-        return a string concat: rank of suit
 """
 
 
