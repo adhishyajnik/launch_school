@@ -11,3 +11,4 @@ class Cat:
 
 kitty = Cat()
 # Expected Output: I'm a cat!
+dave = Cat()
