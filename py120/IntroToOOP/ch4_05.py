@@ -1,7 +1,7 @@
 """
 We've provided new Car and Truck classes and some tests below. Refactor them to
 use inheritance for as much behavior as possible. The tests shown in the code
-should still work as shown.
+should still work as shown:
 """
 
 
