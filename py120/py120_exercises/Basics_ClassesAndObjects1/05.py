@@ -13,4 +13,3 @@ class Cat:
 
 kitty = Cat("Sophie")
 # Expected Output: Hello! My name is Sophie!
-dave = Cat("Dave")
