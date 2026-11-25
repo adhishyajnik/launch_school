@@ -60,6 +60,43 @@ class Computer(Player):
         self.move = random.choice(Player.CHOICES[:3])
 
 
+class Score:
+    def __init__(self):
+        self.human_pts = 0
+        self.computer_pts = 0
+        self.match_point = None
+        self.win_score = None
+
+    def reset(self):
+        self.human_pts = 0
+        self.computer_pts = 0
+
+    def add_point(self, player: Player):
+        if player.__class__.__name__ == "Human":
+            self.human_pts += 1
+        else:
+            self.computer_pts += 1
+
+    def display(self):
+        score_lines = [
+            "The score is",
+            f"You: {self.human_pts}",
+            f"Computer: {self.computer_pts}",
+        ]
+        score = "\n".join(score_lines)
+        print(score)
+
+        if self.match_point in [self.human_pts, self.computer_pts]:
+            if self.human_pts == self.computer_pts:
+                print(
+                    f"The game is tied at {self.match_point}! Next point wins!"
+                )
+            elif self.human_pts == self.match_point:
+                print("One more point and you win!")
+            else:
+                print("One more point and the computer wins!")
+
+
 class RPSGame:
     A_BEATS_B = (
         ("rock", "scissors"),
@@ -70,26 +107,18 @@ class RPSGame:
     def __init__(self):
         self._human = Human()
         self._computer = Computer()
-        self._score = None
-        self._best_of = None
-        self._win_score = None
-        self._match_point = None
-
-    def _reset_score(self):
-        self._score = {
-            "human": 0,
-            "computer": 0,
-        }
+        self._score = Score()
+        self._n_games = None
 
     def _display_welcome_message(self):
-        print(f"Welcome to Rock Paper Scissors! (Best of {self._best_of})")
+        print(f"Welcome to Rock Paper Scissors! (Best of {self._n_games})")
 
     def _display_goodbye_message(self):
         print("Thanks for playing Rock Paper Scissors. Goodbye!")
 
     def _display_winner(self):
-        human_move = self._human.move
-        computer_move = self._computer.move
+        human, human_move = self._human, self._human.move
+        computer, computer_move = self._computer, self._computer.move
 
         print(f"You chose: {human_move}")
         print(f"The computer chose: {computer_move}")
@@ -98,39 +127,20 @@ class RPSGame:
             print("It's a tie")
         elif (human_move, computer_move) in RPSGame.A_BEATS_B:
             print("You win this point!")
-            self._score["human"] += 1
+            self._score.add_point(human)
         else:
             print("Computer wins this point!")
-            self._score["computer"] += 1
-
-    def _display_score(self):
-        score_lines = [
-            "The score is",
-            f"You: {self._score['human']}",
-            f"Computer: {self._score['computer']}",
-        ]
-        score = "\n".join(score_lines)
-        print(score)
-
-        if self._match_point in self._score.values():
-            if self._score["human"] == self._score["computer"]:
-                print(
-                    f"The game is tied at {self._match_point}! Next point wins!"
-                )
-            elif self._score["human"] == self._match_point:
-                print("One more point and you win!")
-            else:
-                print("One more point and the computer wins!")
+            self._score.add_point(computer)
 
     def _display_overall_winner(self):
-        if self._score["human"] == self._win_score:
-            print(f"You win best of {self._best_of}!")
+        if self._score.human_pts == self._score.win_score:
+            print(f"You win best of {self._n_games}!")
         else:
-            print(f"Computer wins best of {self._best_of}!")
+            print(f"Computer wins best of {self._n_games}!")
 
     def _play_again(self):
         prompt_lines = [
-            f"Would you like to play best of {self._best_of} again? (y/n)",
+            f"Would you like to play best of {self._n_games} again? (y/n)",
             "> ",
         ]
         prompt = "\n".join(prompt_lines)
@@ -142,38 +152,40 @@ class RPSGame:
 
             print(f"{answer} is invalid")
 
-    def _best_of_n(self):
-        if (not isinstance(self._best_of, int)) or self._best_of < 3:
-            self._best_of = 3
-        if self._best_of % 2 == 0:
-            self._best_of += 1
+    def _best_of(self, n_games):
+        if (not isinstance(n_games, int)) or n_games < 3:
+            self._n_games = 3
+        if n_games % 2 == 0:
+            self._n_games = n_games + 1
 
-        self._win_score = (self._best_of + 1) // 2
-        self._match_point = self._win_score - 1
+        self._score.match_point = (self._n_games) // 2
+        self._score.win_score = self._score.match_point + 1
 
     def _play_best_of(self):
-        while self._win_score not in self._score.values():
+        while self._score.win_score not in [
+            self._score.human_pts,
+            self._score.computer_pts,
+        ]:
             self._human.choose()
             if self._human.move == "q":
-                return -1
+                return "q"
             self._computer.choose()
             self._display_winner()
-            self._display_score()
+            self._score.display()
 
         self._display_overall_winner()
 
-    def play(self, best_of=3):
-        self._best_of = best_of
-        self._best_of_n()
+    def play(self, n_games=3):
+        self._best_of(n_games)
 
         self._display_welcome_message()
-        self._reset_score()
+        self._score.reset()
 
         while True:
-            if self._play_best_of() is not None:
+            if self._play_best_of() == "q":
                 break
             if self._play_again():
-                self._reset_score()
+                self._score.reset()
             else:
                 break
 
